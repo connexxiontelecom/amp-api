@@ -401,12 +401,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fzaninotto/Faker.git",
-                "reference": "ac73e5287024f5e98dd6d0bf10e6a6f7877b7513"
+                "reference": "5ffe7db6c80f441f150fc88008d64e64af66634b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/ac73e5287024f5e98dd6d0bf10e6a6f7877b7513",
-                "reference": "ac73e5287024f5e98dd6d0bf10e6a6f7877b7513",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/5ffe7db6c80f441f150fc88008d64e64af66634b",
+                "reference": "5ffe7db6c80f441f150fc88008d64e64af66634b",
                 "shasum": ""
             },
             "require": {
@@ -444,7 +444,7 @@
                 "fixtures"
             ],
             "abandoned": true,
-            "time": "2020-10-27T14:15:58+00:00"
+            "time": "2020-12-11T09:59:14+00:00"
         },
         {
             "name": "mikey179/vfsstream",
