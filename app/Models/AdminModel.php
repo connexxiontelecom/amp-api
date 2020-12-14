@@ -3,6 +3,6 @@ use CodeIgniter\Model;
 
 class AdminModel extends Model {
   protected $table = 'admin';
-  protected $allowedFields = ['firstname', 'lastname', 'username', 'password'];
+  protected $allowedFields = ['firstname', 'lastname', 'username', 'password', 'status'];
   protected $primaryKey = 'admin_id';
 }

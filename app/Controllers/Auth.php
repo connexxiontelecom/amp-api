@@ -24,7 +24,8 @@ class Auth extends ResourceController {
 		  if ($user) {
 			  if (password_verify($password, $user['password'])) {
 				  $session = [
-					  'admin'=> true
+					  'admin'=> true,
+					  'affiliate' => false,
 				  ];
 				  $secret_key = getenv('JWT_SECRET');
 				  $payload = [
