@@ -1,12 +1,18 @@
 <?php namespace App\Controllers;
 use App\Models\CommissionModel;
+use App\Models\ProductModel;
+use App\Models\ProductPlanModel;
 use CodeIgniter\RESTful\ResourceController;
 
 class Commission extends ResourceController {
 	private $commission;
+	private $product_plan;
+	private $product;
 
 	function __construct() {
 		$this->commission = new CommissionModel();
+		$this->product_plan = new ProductPlanModel();
+		$this->product = new ProductModel();
 	}
 
 	function get_commissions() {
@@ -84,5 +90,26 @@ class Commission extends ResourceController {
 		} else {
 			return $this->failNotFound('Commission not found');
 		}
+	}
+
+	function get_plan_commissions() {
+		$current_generation = $this->commission->where('current_gen', 1)->first();
+		$product_plans = $this->product_plan->findAll();
+		$plan_commissions = [];
+		foreach ($product_plans as $product_plan) {
+			$product = $this->product->where('product_id', $product_plan['product_id'])->first();
+			$product_plan['product_name'] = $product['name'];
+			$product_plan['gen_1'] = ((int)$current_generation['gen_1'] / 100) * (int)$product_plan['plan_commission'];
+			$product_plan['gen_2'] = ((int)$current_generation['gen_2'] / 100) * (int)$product_plan['plan_commission'];
+			$product_plan['gen_3'] = ((int)$current_generation['gen_3'] / 100) * (int)$product_plan['plan_commission'];
+			$product_plan['gen_4'] = ((int)$current_generation['gen_4'] / 100) * (int)$product_plan['plan_commission'];
+			$product_plan['gen_5'] = ((int)$current_generation['gen_5'] / 100) * (int)$product_plan['plan_commission'];
+			array_push($plan_commissions, $product_plan);
+		}
+		$payload = [
+			'current_generation' => $current_generation,
+			'plan_commissions' => $plan_commissions
+		];
+		return $this->respond($payload);
 	}
 }
