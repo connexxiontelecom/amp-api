@@ -1,18 +1,7 @@
 <?php namespace App\Controllers;
-use App\Models\ProductModel;
-use App\Models\ProductPlanModel;
-use CodeIgniter\RESTful\ResourceController;
 
-class Product extends ResourceController {
-	private $product;
-	private $product_plan;
-	private $validation;
 
-	function __construct() {
-		$this->product = new ProductModel();
-		$this->product_plan = new ProductPlanModel();
-		$this->validation = \Config\Services::validation();
-	}
+class Product extends BaseController {
 
 	function all_products() {
 		$products = $this->product->findAll();

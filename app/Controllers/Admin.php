@@ -1,15 +1,6 @@
 <?php namespace App\Controllers;
-use App\Models\AdminModel;
-use CodeIgniter\RESTful\ResourceController;
 
-class Admin extends ResourceController {
-	private $admin;
-	private $validation;
-
-	function __construct() {
-		$this->admin = new AdminModel();
-		$this->validation = \Config\Services::validation();
-	}
+class Admin extends BaseController {
 
 	function all_admins() {
 		$admins = $this->admin->findAll();
@@ -24,19 +15,13 @@ class Admin extends ResourceController {
 			'password' => 'required|min_length[5]'
 		]);
 		if ($this->validation->withRequest($this->request)->run()) {
-			$firstname = $this->request->getPost('firstname');
-			$lastname = $this->request->getPost('lastname');
-			$username = $this->request->getPost('username');
-			$password = password_hash($this->request->getPost('password'), PASSWORD_BCRYPT);
-			$status = $this->request->getPost('status');
-			$user = $this->admin->where('username', $username)->first();
-			if (!$user) {
+			if (!$this->check_username_exists($this->request->getPost('username'))) {
 				$admin_user = [
-					'firstname' => $firstname,
-					'lastname' => $lastname,
-					'username' => $username,
-					'password' => $password,
-					'status' => $status
+					'firstname' => $this->request->getPost('firstname'),
+					'lastname' => $this->request->getPost('lastname'),
+					'username' => $this->request->getPost('username'),
+					'password' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT),
+					'status' => $this->request->getPost('status')
 				];
 				try {
 					$save = $this->admin->save($admin_user);
@@ -49,7 +34,7 @@ class Admin extends ResourceController {
 					return $this->fail('Admin account could not be created');
 				}
 			} else {
-				return $this->fail('Admin account with that username already exists');
+				return $this->fail('Account with that username already exists');
 			}
 		} else {
 			return $this->fail($this->validation->getErrors());

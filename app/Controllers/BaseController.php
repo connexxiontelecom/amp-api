@@ -14,9 +14,15 @@ namespace App\Controllers;
  * @package CodeIgniter
  */
 
-use CodeIgniter\Controller;
+use App\Models\AdminModel;
+use App\Models\AffiliateModel;
+use App\Models\CommissionModel;
+use App\Models\ProductModel;
+use App\Models\ProductPlanModel;
+use CodeIgniter\RESTful\ResourceController;
+use Firebase\JWT\JWT;
 
-class BaseController extends Controller
+class BaseController extends ResourceController
 {
 
 	/**
@@ -27,6 +33,12 @@ class BaseController extends Controller
 	 * @var array
 	 */
 	protected $helpers = [];
+	protected $admin;
+	protected $affiliate;
+	protected $commission;
+	protected $product;
+	protected $product_plan;
+	protected $validation;
 
 	/**
 	 * Constructor.
@@ -41,6 +53,43 @@ class BaseController extends Controller
 		//--------------------------------------------------------------------
 		// E.g.:
 		// $this->session = \Config\Services::session();
+		$this->admin = new AdminModel();
+		$this->affiliate = new AffiliateModel();
+		$this->commission = new CommissionModel();
+		$this->product = new ProductModel();
+		$this->product_plan = new ProductPlanModel();
+		$this->validation = \Config\Services::validation();
 	}
 
+	protected function jwt($user, $session): string {
+		$secret_key = getenv('JWT_SECRET');
+		$payload = [
+			"iss" => "THE_CLAIM",
+			"aud" => "THE_AUDIENCE",
+			"iat" => time(),
+			"nbf" => time(),
+			"exp" => time() + 3600,
+			'user' => $user,
+			'session' => $session
+		];
+		return JWT::encode($payload, $secret_key);
+	}
+
+	protected function generate_ref_code($length = 10): string {
+		$characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$characters_length = strlen($characters);
+		$ref_code = '';
+		for ($i = 0; $i < $length; $i++) {
+			$ref_code .= $characters[rand(0, $characters_length - 1)];
+		}
+		return $ref_code;
+	}
+
+	protected function check_username_exists($username) {
+		return $this->admin->where('username', $username)->first() || $this->affiliate->where('username', $username)->first();
+	}
+
+	protected function check_email_exists($email) {
+		return $this->affiliate->where('email', $email)->first();
+	}
 }

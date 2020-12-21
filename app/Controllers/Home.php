@@ -1,15 +1,6 @@
 <?php namespace App\Controllers;
-use App\Models\AdminModel;
-use CodeIgniter\RESTful\ResourceController;
 
-class Home extends ResourceController
-{
-	private $admin;
-	private $validation;
-
-	function __construct() {
-		$this->admin = new AdminModel();
-	}
+class Home extends BaseController {
 
 	function index() {
 		$admin_accounts = $this->admin->findAll();

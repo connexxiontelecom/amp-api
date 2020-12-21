@@ -1,19 +1,6 @@
 <?php namespace App\Controllers;
-use App\Models\CommissionModel;
-use App\Models\ProductModel;
-use App\Models\ProductPlanModel;
-use CodeIgniter\RESTful\ResourceController;
 
-class Commission extends ResourceController {
-	private $commission;
-	private $product_plan;
-	private $product;
-
-	function __construct() {
-		$this->commission = new CommissionModel();
-		$this->product_plan = new ProductPlanModel();
-		$this->product = new ProductModel();
-	}
+class Commission extends BaseController {
 
 	function get_commissions() {
 		$current_generation = $this->commission->where('current_gen', 1)->first();
