@@ -1,0 +1,7 @@
+
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/connexxtel/amp-api.connexxiontelecom.com/
+    - /bin/cp -R * $DEPLOYPATH
+
