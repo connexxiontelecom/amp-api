@@ -104,4 +104,39 @@ class Affiliate extends BaseController {
 			return $this->fail($this->validation->getErrors());
 		}
 	}
+
+	function get_affiliate($affiliate_id) {
+		$affiliate = $this->affiliate->find($affiliate_id);
+		if ($affiliate) {
+			$upstream_affiliate = $this->affiliate->where('affiliate_id', $affiliate['upstream_affiliate_id'])->find();
+			$affiliate['password'] = '';
+			$affiliate['upstream_affiliate'] = $upstream_affiliate;
+			return $this->respond($affiliate);
+		} else {
+			return $this->failNotFound('Affiliate was not found');
+		}
+	}
+
+	function toggle_affiliate_status($affiliate_id) {
+		$affiliate = $this->affiliate->find($affiliate_id);
+		if ($affiliate) {
+			$affiliate['status'] == 1 ? $affiliate['status'] = 0 : $affiliate['status'] = 1;
+			try {
+				$save = $this->affiliate->save($affiliate);
+			} catch (\Exception $ex) {
+				return $this->fail($ex->getMessage());
+			}
+			if ($save) {
+				$affiliate = $this->affiliate->find($affiliate_id);
+				$upstream_affiliate = $this->affiliate->where('affiliate_id', $affiliate['upstream_affiliate_id'])->find();
+				$affiliate['password'] = '';
+				$affiliate['upstream_affiliate'] = $upstream_affiliate;
+				return $this->respond($affiliate);
+			} else {
+				return $this->fail('Affiliate account status could not be changed');
+			}
+		} else {
+			return $this->failNotFound('Affiliate was not found');
+		}
+	}
 }
