@@ -15,7 +15,9 @@ namespace App\Controllers;
  */
 
 use App\Models\AdminModel;
+use App\Models\AffiliateInfoModel;
 use App\Models\AffiliateModel;
+use App\Models\BankModel;
 use App\Models\CommissionModel;
 use App\Models\ProductModel;
 use App\Models\ProductPlanModel;
@@ -35,6 +37,8 @@ class BaseController extends ResourceController
 	protected $helpers = [];
 	protected $admin;
 	protected $affiliate;
+	protected $affiliate_info;
+	protected $bank;
 	protected $commission;
 	protected $product;
 	protected $product_plan;
@@ -55,6 +59,8 @@ class BaseController extends ResourceController
 		// $this->session = \Config\Services::session();
 		$this->admin = new AdminModel();
 		$this->affiliate = new AffiliateModel();
+		$this->affiliate_info = new AffiliateInfoModel();
+		$this->bank = new BankModel();
 		$this->commission = new CommissionModel();
 		$this->product = new ProductModel();
 		$this->product_plan = new ProductPlanModel();
@@ -91,5 +97,9 @@ class BaseController extends ResourceController
 
 	protected function check_email_exists($email) {
 		return $this->affiliate->where('email', $email)->first();
+	}
+
+	protected function check_product_name_exists($product_name) {
+		return $this->product->where('name', $product_name)->first();
 	}
 }

@@ -106,11 +106,8 @@ class Affiliate extends BaseController {
 	}
 
 	function get_affiliate($affiliate_id) {
-		$affiliate = $this->affiliate->find($affiliate_id);
+		$affiliate = $this->_get_affiliate($affiliate_id);
 		if ($affiliate) {
-			$upstream_affiliate = $this->affiliate->where('affiliate_id', $affiliate['upstream_affiliate_id'])->find();
-			$affiliate['password'] = '';
-			$affiliate['upstream_affiliate'] = $upstream_affiliate;
 			return $this->respond($affiliate);
 		} else {
 			return $this->failNotFound('Affiliate was not found');
@@ -127,16 +124,163 @@ class Affiliate extends BaseController {
 				return $this->fail($ex->getMessage());
 			}
 			if ($save) {
-				$affiliate = $this->affiliate->find($affiliate_id);
-				$upstream_affiliate = $this->affiliate->where('affiliate_id', $affiliate['upstream_affiliate_id'])->find();
-				$affiliate['password'] = '';
-				$affiliate['upstream_affiliate'] = $upstream_affiliate;
+				$affiliate = $this->_get_affiliate($affiliate_id);
 				return $this->respond($affiliate);
 			} else {
 				return $this->fail('Affiliate account status could not be changed');
 			}
 		} else {
 			return $this->failNotFound('Affiliate was not found');
+		}
+	}
+
+	function update_affiliate_account() {
+		$this->validation->setRules([
+			'affiliate_id' => 'required',
+			'email' => 'required',
+			'firstname' => 'required',
+			'lastname' => 'required',
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$affiliate = $this->affiliate->find($this->request->getPost('affiliate_id'));
+			if ($affiliate) {
+				if ($affiliate['email'] == $this->request->getPost('email') || !$this->check_email_exists($this->request->getPost('email'))) {
+					// if not trying to change email or trying to change email and the email is not found
+					$affiliate_account = [
+						'affiliate_id' => $this->request->getPost('affiliate_id'),
+						'email' => $this->request->getPost('email'),
+						'firstname' => $this->request->getPost('firstname'),
+						'lastname' => $this->request->getPost('lastname'),
+						'upstream_affiliate_id' => $this->request->getPost('upstream_affiliate_id')
+					];
+					try {
+						$save = $this->affiliate->save($affiliate_account);
+					} catch (\Exception $ex) {
+						return $this->fail($ex->getMessage());
+					}
+					if ($save) {
+						$affiliate = $this->_get_affiliate($this->request->getPost('affiliate_id'));
+						if ($affiliate) {
+							return $this->respond($affiliate);
+						} else {
+							return $this->failNotFound('Affiliate account not found');
+						}
+					} else {
+						return $this->fail('Affiliate account could not be updated');
+					}
+				} else {
+					return $this->fail('Account with that email already exists');
+				}
+			} else {
+				return $this->failNotFound('Affiliate account not found');
+			}
+		} else {
+			return $this->fail($this->validation->getErrors());
+		}
+	}
+
+	function update_affiliate_info() {
+		$this->validation->setRules([
+			'affiliate_info_id' => 'required',
+			'affiliate_id' => 'required',
+			'phone' => 'required',
+			'dob' => 'required',
+			'gender' => 'required',
+			'address' => 'required',
+			'country' => 'required'
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$affiliate_info = $this->affiliate_info->find($this->request->getPost('affiliate_info_id'));
+			$affiliate_info_data = [
+				'phone' => $this->request->getPost('phone'),
+				'dob' => $this->request->getPost('dob'),
+				'gender' => $this->request->getPost('gender'),
+				'address' => $this->request->getPost('address'),
+				'country' => $this->request->getPost('country'),
+			];
+			if ($affiliate_info) {
+				// update if it exists
+				$affiliate_info_data['affiliate_info_id'] = $this->request->getPost('affiliate_info_id');
+			} else {
+				// create a new one if it doesn't
+				$affiliate_info_data['affiliate_id'] = $this->request->getPost('affiliate_id');
+			}
+			try {
+				$save = $this->affiliate_info->save($affiliate_info_data);
+			} catch (\Exception $ex) {
+				return $this->fail($ex->getMessage());
+			}
+			if ($save) {
+				$affiliate = $this->_get_affiliate($this->request->getPost('affiliate_id'));
+				if ($affiliate) {
+					return $this->respond($affiliate);
+				} else {
+					return $this->failNotFound('Affiliate account not found');
+				}
+			} else {
+				return $this->fail('Affiliate account information could not be updated');
+			}
+		} else {
+			return $this->fail($this->validation->getErrors());
+		}
+	}
+
+	function update_affiliate_bank() {
+		$this->validation->setRules([
+			'bank_id' => 'required',
+			'affiliate_id' => 'required',
+			'bank_name' => 'required',
+			'bank_acc_name' => 'required',
+			'bank_acc_number' => 'required',
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$bank = $this->bank->find($this->request->getPost('bank_id'));
+			$bank_data = [
+				'bank_name' => $this->request->getPost('bank_name'),
+				'bank_acc_name' => $this->request->getPost('bank_acc_name'),
+				'bank_acc_number' => $this->request->getPost('bank_acc_number'),
+			];
+			if ($bank) {
+				// update if it exists
+				$bank_data['bank_id'] = $this->request->getPost('bank_id');
+			} else {
+				// create a new one if it doesn't
+				$bank_data['affiliate_id'] = $this->request->getPost('affiliate_id');
+			}
+			try {
+				$save = $this->bank->save($bank_data);
+			} catch (\Exception $ex) {
+				return $this->fail($ex->getMessage());
+			}
+			if ($save) {
+				$affiliate = $this->_get_affiliate($this->request->getPost('affiliate_id'));
+				if ($affiliate) {
+					return $this->respond($affiliate);
+				} else {
+					return $this->failNotFound('Affiliate account not found');
+				}
+			} else {
+				return $this->fail('Affiliate account information could not be updated');
+			}
+		} else {
+			return $this->fail($this->validation->getErrors());
+		}
+	}
+
+	private function _get_affiliate($affiliate_id) {
+		$affiliate = $this->affiliate->find($affiliate_id);
+		if ($affiliate) {
+			$upstream_affiliate = $this->affiliate->where('affiliate_id', $affiliate['upstream_affiliate_id'])->first();
+			$affiliate_info = $this->affiliate_info->where('affiliate_id', $affiliate['affiliate_id'])->first();
+			$bank = $this->bank->where('affiliate_id', $affiliate['affiliate_id'])->first();
+			$affiliate['password'] = '';
+			$upstream_affiliate['password'] = '';
+			$affiliate['upstream_affiliate'] = $upstream_affiliate;
+			$affiliate['affiliate_info'] = $affiliate_info;
+			$affiliate['bank'] = $bank;
+			return $affiliate;
+		} else {
+			return false;
 		}
 	}
 }
