@@ -19,7 +19,6 @@ class Affiliate extends BaseController {
 			'email' => 'required',
 			'firstname' => 'required',
 			'lastname' => 'required',
-			'ref_code' => 'required',
 		]);
 		if ($this->validation->withRequest($this->request)->run()) {
 			$user = $this->affiliate->where('affiliate_id', $this->request->getPost('affiliate_id'))->first();
@@ -36,7 +35,7 @@ class Affiliate extends BaseController {
 					return $this->fail($ex->getMessage());
 				}
 				if ($save) {
-					$user = $this->affiliate->where('affiliate_id', $this->request->getPost('affiliate_id'))->first();
+					$user = $this->_get_affiliate($this->request->getPost('affiliate_id'));
 					$session = [
 						'admin'=> false,
 						'affiliate' => true,
@@ -274,7 +273,6 @@ class Affiliate extends BaseController {
 			$affiliate_info = $this->affiliate_info->where('affiliate_id', $affiliate['affiliate_id'])->first();
 			$bank = $this->bank->where('affiliate_id', $affiliate['affiliate_id'])->first();
 			$affiliate['password'] = '';
-			$upstream_affiliate['password'] = '';
 			$affiliate['upstream_affiliate'] = $upstream_affiliate;
 			$affiliate['affiliate_info'] = $affiliate_info;
 			$affiliate['bank'] = $bank;

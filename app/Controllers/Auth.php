@@ -17,12 +17,20 @@ class Auth extends BaseController {
 		  $user = $this->admin->where('username', $username)->first();
 		  if ($user && password_verify($password, $user['password'])) {
 			  $session['admin'] = true;
+			  $user['password'] = '';
 			  $token = $this->jwt($user, $session);
 			  return $this->respond($token);
 		  } else {
 			  $user = $this->affiliate->where('username', $username)->first();
 			  if ($user && password_verify($password, $user['password'])) {
+			  	$upstream_affiliate = $this->affiliate->where('affiliate_id', $user['upstream_affiliate_id'])->first();
+			  	$affiliate_info = $this->affiliate_info->where('affiliate_id', $user['affiliate_id'])->first();
+				  $bank = $this->bank->where('affiliate_id', $user['affiliate_id'])->first();
 				  $session['affiliate'] = true;
+				  $user['password'] = '';
+				  $user['upstream_affiliate'] = $upstream_affiliate;
+				  $user['affiliate_info'] = $affiliate_info;
+				  $user['bank'] = $bank;
 				  $token = $this->jwt($user, $session);
 				  return $this->respond($token);
 			  } else {
