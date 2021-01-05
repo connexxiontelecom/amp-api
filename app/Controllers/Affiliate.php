@@ -56,6 +56,60 @@ class Affiliate extends BaseController {
 		}
 	}
 
+	function update_info() {
+		$this->validation->setRules([
+			'affiliate_info_id' => 'required',
+			'affiliate_id' => 'required',
+			'phone' => 'required',
+			'dob' => 'required',
+			'gender' => 'required',
+			'address' => 'required',
+			'country' => 'required'
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$affiliate_info = $this->affiliate_info->find($this->request->getPost('affiliate_info_id'));
+			$affiliate_info_data = [
+				'phone' => $this->request->getPost('phone'),
+				'dob' => $this->request->getPost('dob'),
+				'gender' => $this->request->getPost('gender'),
+				'address' => $this->request->getPost('address'),
+				'country' => $this->request->getPost('country'),
+			];
+			if ($affiliate_info) {
+				// update if it exists
+				$affiliate_info_data['affiliate_info_id'] = $this->request->getPost('affiliate_info_id');
+			} else {
+				// create a new one if it doesn't
+				$affiliate_info_data['affiliate_id'] = $this->request->getPost('affiliate_id');
+			}
+			try {
+				$save = $this->affiliate_info->save($affiliate_info_data);
+			} catch (\Exception $ex) {
+				return $this->fail($ex->getMessage());
+			}
+			if ($save) {
+				$user = $this->_get_affiliate($this->request->getPost('affiliate_id'));
+				if ($user) {
+					$session = [
+						'admin'=> false,
+						'affiliate' => true,
+					];
+					$payload = [
+						'user' => $user,
+						'session' => $session
+					];
+					return $this->respondUpdated($payload);
+				} else {
+					return $this->failNotFound('User account not found');
+				}
+			} else {
+				return $this->fail('User account information could not be updated');
+			}
+		} else {
+			return $this->fail($this->validation->getErrors());
+		}
+	}
+
 	function add_affiliate() {
 		$this->validation->setRules([
 			'firstname' => 'required',
