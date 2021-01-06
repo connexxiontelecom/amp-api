@@ -103,7 +103,57 @@ class Affiliate extends BaseController {
 					return $this->failNotFound('User account not found');
 				}
 			} else {
-				return $this->fail('User account information could not be updated');
+				return $this->fail('User information could not be updated');
+			}
+		} else {
+			return $this->fail($this->validation->getErrors());
+		}
+	}
+
+	function update_bank() {
+		$this->validation->setRules([
+			'bank_id' => 'required',
+			'affiliate_id' => 'required',
+			'bank_name' => 'required',
+			'bank_acc_name' => 'required',
+			'bank_acc_number' => 'required',
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$bank = $this->bank->find($this->request->getPost('bank_id'));
+			$bank_data = [
+				'bank_name' => $this->request->getPost('bank_name'),
+				'bank_acc_name' => $this->request->getPost('bank_acc_name'),
+				'bank_acc_number' => $this->request->getPost('bank_acc_number'),
+			];
+			if ($bank) {
+				// update if it exists
+				$bank_data['bank_id'] = $this->request->getPost('bank_id');
+			} else {
+				// create a new one if it doesn't
+				$bank_data['affiliate_id'] = $this->request->getPost('affiliate_id');
+			}
+			try {
+				$save = $this->bank->save($bank_data);
+			} catch (\Exception $ex) {
+				return $this->fail($ex->getMessage());
+			}
+			if ($save) {
+				$user = $this->_get_affiliate($this->request->getPost('affiliate_id'));
+				if ($user) {
+					$session = [
+						'admin'=> false,
+						'affiliate' => true,
+					];
+					$payload = [
+						'user' => $user,
+						'session' => $session
+					];
+					return $this->respondUpdated($payload);
+				} else {
+					return $this->failNotFound('User account not found');
+				}
+			} else {
+				return $this->fail('User bank information could not be updated');
 			}
 		} else {
 			return $this->fail($this->validation->getErrors());
