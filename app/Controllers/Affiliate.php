@@ -13,6 +13,11 @@ class Affiliate extends BaseController {
 		return $this->respond($payload);
 	}
 
+	function get_downstream_affiliates($affiliate_id) {
+		$affiliates = $this->affiliate->where('upstream_affiliate_id', $affiliate_id)->findAll();
+		return $this->respond($affiliates);
+	}
+
 	function update_account() {
 		$this->validation->setRules([
 			'affiliate_id' => 'required',
@@ -191,6 +196,48 @@ class Affiliate extends BaseController {
 								array_push($payload, $affiliate);
 							}
 							return $this->respond($payload);
+						} else {
+							return $this->fail('Affiliate account could not be created');
+						}
+					} catch (\Exception $ex) {
+						return $this->fail($ex->getMessage());
+					}
+				} else {
+					return $this->fail('Account with that email already exists');
+				}
+			} else {
+				return $this->fail('Account with that username already exists');
+			}
+		} else {
+			return $this->fail($this->validation->getErrors());
+		}
+	}
+
+	function add_downstream_affiliate() {
+		$this->validation->setRules([
+			'firstname' => 'required',
+			'lastname' => 'required',
+			'username' => 'required',
+			'email' => 'required|valid_email',
+			'password' => 'required|min_length[5]'
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			if (!$this->check_username_exists($this->request->getPost('username'))) {
+				if (!$this->check_email_exists($this->request->getPost('email'))) {
+					$affiliate_data = [
+						'firstname' => $this->request->getPost('firstname'),
+						'lastname' => $this->request->getPost('lastname'),
+						'username' => $this->request->getPost('username'),
+						'email' => $this->request->getPost('email'),
+						'password' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT),
+						'upstream_affiliate_id' => $this->request->getPost('upstream_affiliate_id'),
+						'ref_code' => $this->generate_ref_code()
+					];
+					try {
+						$save = $this->affiliate->save($affiliate_data);
+						if ($save) {
+							$affiliates = $this->affiliate->where('upstream_affiliate_id', $this->request->getPost('upstream_affiliate_id'))->findAll();
+							return $this->respond($affiliates);
 						} else {
 							return $this->fail('Affiliate account could not be created');
 						}
