@@ -417,6 +417,38 @@ class Affiliate extends BaseController {
 		}
 	}
 
+	public function change_password() {
+		$this->validation->setRules([
+			'affiliate_id' => 'required',
+			'password' => 'required',
+			'new_password' => 'required|min_length[5]',
+			'confirm_password' => 'required|min_length[5]|matches[new_password]'
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$affiliate = $this->affiliate->where('affiliate_id', $this->request->getPost('affiliate_id'))->first();
+			if ($affiliate && password_verify($this->request->getPost('password'), $affiliate['password'])) {
+				$data = [
+					'affiliate_id' => $this->request->getPost('affiliate_id'),
+					'password' => password_hash($this->request->getPost('new_password'), PASSWORD_BCRYPT),
+				];
+				try {
+					$save = $this->affiliate->save($data);
+				} catch (\Exception $ex) {
+					return $this->fail($ex->getMessage());
+				}
+				if ($save) {
+					return $this->respondUpdated('Affiliate password was updated. Please log back in with your new credentials');
+				} else {
+					return $this->fail('Affiliate password could not be updated');
+				}
+			} else {
+				return $this->fail('Invalid password');
+			}
+		} else {
+			return $this->fail($this->validation->getErrors());
+		}
+	}
+
 	private function _get_affiliate($affiliate_id) {
 		$affiliate = $this->affiliate->find($affiliate_id);
 		if ($affiliate) {

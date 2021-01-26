@@ -3,6 +3,6 @@ use CodeIgniter\Model;
 
 class ProductPlanModel extends Model {
 	protected $table = 'product_plan';
-	protected $allowedFields = ['product_id', 'plan_name', 'plan_price', 'plan_link', 'plan_commission'];
+	protected $allowedFields = ['product_id', 'plan_name', 'plan_price', 'plan_link', 'plan_commission', 'plan_slug'];
 	protected $primaryKey = 'product_plan_id';
 }

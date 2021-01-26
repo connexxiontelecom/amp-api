@@ -72,7 +72,8 @@ class Product extends BaseController {
 			'plan_name' => 'required',
 			'plan_price' => 'required',
 			'plan_link' => 'required',
-			'plan_commission' => 'required'
+			'plan_commission' => 'required',
+			'plan_slug' => 'required'
 		]);
 		if ($this->validation->withRequest($this->request)->run()) {
 			$product_id = $this->request->getPost('product_id');
@@ -80,6 +81,7 @@ class Product extends BaseController {
 			$plan_price = $this->request->getPost('plan_price');
 			$plan_link = $this->request->getPost('plan_link');
 			$plan_commission = $this->request->getPost('plan_commission');
+			$plan_slug = $this->request->getPost('plan_slug');
 			$product = $this->product->find($product_id);
 			if ($product) {
 				$plan_data = [
@@ -87,7 +89,8 @@ class Product extends BaseController {
 					'plan_name' => $plan_name,
 					'plan_price' => $plan_price,
 					'plan_link' => $plan_link,
-					'plan_commission' => $plan_commission
+					'plan_commission' => $plan_commission,
+					'plan_slug' => $plan_slug
 				];
 				try {
 					$save = $this->product_plan->save($plan_data);
@@ -120,7 +123,8 @@ class Product extends BaseController {
 			'plan_name' => 'required',
 			'plan_price' => 'required',
 			'plan_link' => 'required',
-			'plan_commission' => 'required'
+			'plan_commission' => 'required',
+			'plan_slug' => 'required',
 		]);
 		if ($this->validation->withRequest($this->request)->run()) {
 			$product = $this->product->find($this->request->getPost('product_id'));
@@ -131,7 +135,8 @@ class Product extends BaseController {
 					'plan_name' => $this->request->getPost('plan_name'),
 					'plan_price' => $this->request->getPost('plan_price'),
 					'plan_link' => $this->request->getPost('plan_link'),
-					'plan_commission' => $this->request->getPost('plan_commission')
+					'plan_commission' => $this->request->getPost('plan_commission'),
+					'plan_slug' => $this->request->getPost('plan_slug')
 				];
 				try {
 					$save = $this->product_plan->save($plan_data);

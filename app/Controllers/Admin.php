@@ -41,6 +41,15 @@ class Admin extends BaseController {
 		}
 	}
 
+	function get_admin($admin_id) {
+		$admin = $this->admin->find($admin_id);
+		if ($admin) {
+			return $this->respond($admin);
+		} else {
+			return $this->failNotFound('Admin was not found');
+		}
+	}
+
 	function update_status() {
 		$this->validation->setRules([
 			'admin_id' => 'required',
