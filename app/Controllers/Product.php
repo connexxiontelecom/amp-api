@@ -25,14 +25,22 @@ class Product extends BaseController {
 	function add_product() {
 		$this->validation->setRules([
 			'name' => 'required',
-			'category' => 'required'
+			'category' => 'required',
+			'logo' => [
+				'uploaded[logo]',
+				'mime_in[logo,image/jpg,image/jpeg,image/gif,image/png]',
+				'max_size[logo,2097152]'
+			]
 		]);
 		if ($this->validation->withRequest($this->request)->run()) {
 			if (!$this->check_product_name_exists($this->request->getPost('name'))) {
+				$logo = $this->request->getFile('logo');
+				$logo->move(ROOTPATH.'public/uploads');
 				$product = [
 					'name' => $this->request->getPost('name'),
 					'url' => $this->request->getPost('url'),
 					'category' => $this->request->getPost('category'),
+					'logo' => $logo->getClientName(),
 					'description' => $this->request->getPost('description'),
 				];
 				try {
@@ -50,19 +58,133 @@ class Product extends BaseController {
 				return $this->failResourceExists('Product with that name already exists');
 			}
 		} else {
+			return $this->fail('Form validation failed. Please confirm logo was uploaded correctly');
+		}
+	}
+
+	function update_product() {
+		$this->validation->setRules([
+			'product_id' => 'required',
+			'name' => 'required',
+			'category' => 'required',
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$product = $this->check_product_name_exists($this->request->getPost('name'));
+			if ($product) {
+				if($product['product_id'] != $this->request->getPost('product_id')) {
+					return $this->failResourceExists('Product with that name already exists');
+				}
+			}
+			$product = [
+				'product_id' => $this->request->getPost('product_id'),
+				'name' => $this->request->getPost('name'),
+				'url' => $this->request->getPost('url'),
+				'category' => $this->request->getPost('category'),
+				'description' => $this->request->getPost('description'),
+			];
+			try {
+				$save = $this->product->save($product);
+			} catch (\Exception $ex) {
+				return $this->fail($ex->getMessage());
+			}
+			if ($save) {
+				$product = $this->product->find($this->request->getPost('product_id'));
+				if ($product) {
+					$plans = $this->product_plan->where('product_id', $this->request->getPost('product_id'))->findAll();
+					$payload = [
+						'product' => $product,
+						'plans' => $plans
+					];
+					return $this->respond($payload);
+				} else {
+					return $this->fail('Product was not found');
+				}
+			} else {
+				return $this->fail('Product could not be updated');
+			}
+		} else {
 			return $this->fail($this->validation->getErrors());
 		}
 	}
 
-	private function increment_num_plans($product_id, $num_plans): bool {
-		$product_data = [
-			'product_id' => $product_id,
-			'num_plans' => $num_plans
-		];
-		try {
-			return $this->product->save($product_data);
-		} catch (\Exception $ex) {
-			return false;
+	function update_logo() {
+		$this->validation->setRules([
+			'product_id' => 'required',
+			'logo' => [
+				'uploaded[logo]',
+				'mime_in[logo,image/jpg,image/jpeg,image/gif,image/png]',
+				'max_size[logo,2097152]'
+			]
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$product = $this->product->find($this->request->getPost('product_id'));
+			if ($product) {
+				if ($product['logo']) {
+					unlink(ROOTPATH.'public/uploads/'.$product['logo']);
+				}
+				$logo = $this->request->getFile('logo');
+				$logo->move(ROOTPATH.'public/uploads');
+				$product = [
+					'product_id' => $this->request->getPost('product_id'),
+					'logo' => $logo->getClientName(),
+				];
+				try {
+					$save = $this->product->save($product);
+				} catch (\Exception $ex) {
+					return $this->fail($ex->getMessage());
+				}
+				if ($save) {
+					$product = $this->product->find($this->request->getPost('product_id'));
+					$plans = $this->product_plan->where('product_id', $this->request->getPost('product_id'))->findAll();
+					$payload = [
+						'product' => $product,
+						'plans' => $plans
+					];
+					return $this->respond($payload);
+				} else {
+					return $this->fail('Product could not be added');
+				}
+			} else {
+				return $this->failNotFound('Product was not found');
+			}
+		} else {
+			return $this->fail('Form validation failed. Please confirm logo was uploaded correctly');
+		}
+	}
+
+	function remove_logo() {
+		$this->validation->setRules([
+			'product_id' => 'required',
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$product = $this->product->find($this->request->getPost('product_id'));
+			if ($product) {
+				unlink(ROOTPATH.'public/uploads/'.$product['logo']);
+				$product = [
+					'product_id' => $this->request->getPost('product_id'),
+					'logo' => '',
+				];
+				try {
+					$save = $this->product->save($product);
+				} catch (\Exception $ex) {
+					return $this->fail($ex->getMessage());
+				}
+				if ($save) {
+					$product = $this->product->find($this->request->getPost('product_id'));
+					$plans = $this->product_plan->where('product_id', $this->request->getPost('product_id'))->findAll();
+					$payload = [
+						'product' => $product,
+						'plans' => $plans
+					];
+					return $this->respond($payload);
+				} else {
+					return $this->fail('Product logo could not be deleted');
+				}
+			} else {
+				return $this->failNotFound('Product was not found');
+			}
+		} else {
+			return $this->fail($this->validation->getErrors());
 		}
 	}
 
@@ -159,6 +281,72 @@ class Product extends BaseController {
 			}
 		} else {
 			return $this->fail($this->validation->getErrors());
+		}
+	}
+
+	function delete_plan() {
+		$this->validation->setRules([
+			'product_id' => 'required',
+			'product_plan_id' => 'required',
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$plan = $this->product_plan->find($this->request->getPost('product_plan_id'));
+			$product = $this->product->find($this->request->getPost('product_id'));
+			if ($plan) {
+				$this->product_plan->delete($this->request->getPost('product_plan_id'));
+				$plans = $this->product_plan->where('product_id', $this->request->getPost('product_id'))->findAll();
+				$this->increment_num_plans($this->request->getPost('product_id'), count($plans));
+				$payload = [
+					'product' => $product,
+					'plans' => $plans
+				];
+				return $this->respond($payload);
+			} else {
+				return $this->failNotFound('Plan not found');
+			}
+		} else {
+			return $this->fail($this->validation->getErrors());
+		}
+	}
+
+	function toggle_product_status($product_id) {
+		$product = $this->product->find($product_id);
+		if ($product) {
+			$product['status'] == 1 ? $product['status'] = 0 : $product['status'] = 1;
+			try {
+				$save = $this->product->save($product);
+			} catch (\Exception $ex) {
+				return $this->fail($ex->getMessage());
+			}
+			if ($save) {
+				$product = $this->product->find($product_id);
+				if ($product) {
+					$plans = $this->product_plan->where('product_id', $product_id)->findAll();
+					$payload = [
+						'product' => $product,
+						'plans' => $plans
+					];
+					return $this->respond($payload);
+				} else {
+					return $this->fail('Product was not found');
+				}
+			} else {
+				return $this->fail('Product status could not be changed');
+			}
+		} else {
+			return $this->failNotFound('Affiliate was not found');
+		}
+	}
+
+	private function increment_num_plans($product_id, $num_plans): bool {
+		$product_data = [
+			'product_id' => $product_id,
+			'num_plans' => $num_plans
+		];
+		try {
+			return $this->product->save($product_data);
+		} catch (\Exception $ex) {
+			return false;
 		}
 	}
 
