@@ -3,13 +3,6 @@
 class Home extends BaseController {
 
 	function index() {
-		$admin_accounts = $this->admin->findAll();
-		$statistics = [
-			'admin_accounts' => $admin_accounts
-		];
-	  return $this->respond($statistics);
+		return $this->respond('Welcome to AMP-API v0. Powered by your friends at Connexxion Telecom.');
 	}
-
-	//--------------------------------------------------------------------
-
 }
