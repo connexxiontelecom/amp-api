@@ -43,7 +43,9 @@ class BaseController extends ResourceController
 	protected $product;
 	protected $product_plan;
 	protected $validation;
+	protected $decoded_token;
 
+	private $secret_key;
 	/**
 	 * Constructor.
 	 */
@@ -65,10 +67,12 @@ class BaseController extends ResourceController
 		$this->product = new ProductModel();
 		$this->product_plan = new ProductPlanModel();
 		$this->validation = \Config\Services::validation();
+		$this->secret_key = getenv('JWT_SECRET');
+		$this->decode_token();
+
 	}
 
 	protected function jwt($user, $session): string {
-		$secret_key = getenv('JWT_SECRET');
 		$payload = [
 			"iss" => "THE_CLAIM",
 			"aud" => "THE_AUDIENCE",
@@ -78,7 +82,7 @@ class BaseController extends ResourceController
 			'user' => $user,
 			'session' => $session
 		];
-		return JWT::encode($payload, $secret_key);
+		return JWT::encode($payload, $this->secret_key);
 	}
 
 	protected function generate_ref_code($length = 10): string {
@@ -101,5 +105,40 @@ class BaseController extends ResourceController
 
 	protected function check_product_name_exists($product_name) {
 		return $this->product->where('name', $product_name)->first();
+	}
+
+	protected function is_admin_session(): bool {
+		if ($this->decoded_token) {
+			return $this->decoded_token->session->admin;
+		}
+		return false;
+	}
+
+	protected function is_affiliate_session(): bool {
+		if ($this->decoded_token) {
+			return $this->decoded_token->session->affiliate;
+		}
+		return false;
+	}
+
+	private function get_authorization_header() {
+		$headers = array_map(function($header) {
+			return $header->getValueLine();
+		}, $this->request->getHeaders());
+		return $headers['Authorization'];
+	}
+
+	private function decode_token(): bool {
+		$authorization = $this->get_authorization_header();
+		if ($authorization) {
+			$authorization = explode(" ", $authorization);
+			$token = $authorization[1];
+			try {
+				$this->decoded_token = JWT::decode($token, $this->secret_key, array('HS256'));
+			} catch (\Exception $e) {
+				return false;
+			}
+		}
+		return false;
 	}
 }

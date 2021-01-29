@@ -47,6 +47,7 @@ class Auth extends BaseController {
   		'firstname' => 'required',
   		'lastname' => 'required',
   		'username' => 'required',
+		  'verify_code' => 'required',
 		  'email' => 'required|valid_email',
 		  'password' => 'required|min_length[5]',
 		  'confirm_password' => 'required|min_length[5]|matches[password]'
@@ -59,6 +60,7 @@ class Auth extends BaseController {
 					  'lastname' => $this->request->getPost('lastname'),
 					  'username' => $this->request->getPost('username'),
 					  'email' => $this->request->getPost('email'),
+					  'verify_code' => $this->request->getPost('verify_code'),
 					  'password' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT),
 					  'ref_code' => $this->generate_ref_code()
 				  ];

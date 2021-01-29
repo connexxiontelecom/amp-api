@@ -3,19 +3,25 @@
 class Affiliate extends BaseController {
 
 	function all_affiliates() {
-		$affiliates = $this->affiliate->findAll();
-		$payload = [];
-		foreach ($affiliates as $affiliate) {
-			$upstream_affiliate = $this->affiliate->find($affiliate['upstream_affiliate_id']);
-			$affiliate['upstream_affiliate'] = $upstream_affiliate['username'];
-			array_push($payload, $affiliate);
+		if ($this->is_admin_session()) {
+			$affiliates = $this->affiliate->findAll();
+			$payload = [];
+			foreach ($affiliates as $affiliate) {
+				$upstream_affiliate = $this->affiliate->find($affiliate['upstream_affiliate_id']);
+				$affiliate['upstream_affiliate'] = $upstream_affiliate['username'];
+				array_push($payload, $affiliate);
+			}
+			return $this->respond($payload);
 		}
-		return $this->respond($payload);
+		return $this->failUnauthorized();
 	}
 
 	function get_downstream_affiliates($affiliate_id) {
-		$affiliates = $this->affiliate->where('upstream_affiliate_id', $affiliate_id)->findAll();
-		return $this->respond($affiliates);
+		if ($this->is_affiliate_session()) {
+			$affiliates = $this->affiliate->where('upstream_affiliate_id', $affiliate_id)->findAll();
+			return $this->respond($affiliates);
+		}
+		return $this->failUnauthorized();
 	}
 
 	function update_account() {
@@ -170,6 +176,7 @@ class Affiliate extends BaseController {
 			'firstname' => 'required',
 			'lastname' => 'required',
 			'username' => 'required',
+			'verify_code' => 'required',
 			'email' => 'required|valid_email',
 			'password' => 'required|min_length[5]'
 		]);
@@ -181,6 +188,7 @@ class Affiliate extends BaseController {
 						'lastname' => $this->request->getPost('lastname'),
 						'username' => $this->request->getPost('username'),
 						'email' => $this->request->getPost('email'),
+						'verify_code' => $this->request->getPost('verify_code'),
 						'password' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT),
 						'upstream_affiliate_id' => $this->request->getPost('upstream_affiliate_id'),
 						'ref_code' => $this->generate_ref_code()
@@ -218,6 +226,7 @@ class Affiliate extends BaseController {
 			'firstname' => 'required',
 			'lastname' => 'required',
 			'username' => 'required',
+			'verify_code' => 'required',
 			'email' => 'required|valid_email',
 			'password' => 'required|min_length[5]'
 		]);
@@ -229,6 +238,7 @@ class Affiliate extends BaseController {
 						'lastname' => $this->request->getPost('lastname'),
 						'username' => $this->request->getPost('username'),
 						'email' => $this->request->getPost('email'),
+						'verify_code' => $this->request->getPost('verify_code'),
 						'password' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT),
 						'upstream_affiliate_id' => $this->request->getPost('upstream_affiliate_id'),
 						'ref_code' => $this->generate_ref_code()
@@ -443,6 +453,40 @@ class Affiliate extends BaseController {
 				}
 			} else {
 				return $this->fail('Invalid password');
+			}
+		} else {
+			return $this->fail($this->validation->getErrors());
+		}
+	}
+
+	public function verify_account() {
+		$this->validation->setRules([
+			'verify_code' => 'required',
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$affiliate = $this->affiliate->where('verify_code', $this->request->getPost('verify_code'))->first();
+			if ($affiliate) {
+				$payload = ['verified' => false];
+				if ($affiliate['profile'] == 1) {
+					return $this->respond($payload);
+				}
+				$affiliate = [
+					'affiliate_id' => $affiliate['affiliate_id'],
+					'profile' => 1
+				];
+				try {
+					$save = $this->affiliate->save($affiliate);
+				} catch (\Exception $ex) {
+					return $this->fail($ex->getMessage());
+				}
+				if ($save) {
+					$payload['verified'] = true;
+					return $this->respondUpdated($payload);
+				} else {
+					return $this->fail('Affiliate could not be verified');
+				}
+			} else {
+				return $this->failNotFound('Affiliate account not found');
 			}
 		} else {
 			return $this->fail($this->validation->getErrors());
