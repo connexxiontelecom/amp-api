@@ -18,7 +18,8 @@ class Auth extends BaseController {
 		  if ($user && password_verify($password, $user['password'])) {
 			  $session['admin'] = true;
 			  $user['password'] = '';
-			  $token = $this->jwt($user, $session);
+			  $permissions = explode(',', unserialize($user['roles']));
+			  $token = $this->jwt($user, $session, $permissions);
 			  return $this->respond($token);
 		  } else {
 			  $user = $this->affiliate->where('username', $username)->first();
@@ -31,7 +32,8 @@ class Auth extends BaseController {
 				  $user['upstream_affiliate'] = $upstream_affiliate;
 				  $user['affiliate_info'] = $affiliate_info;
 				  $user['bank'] = $bank;
-				  $token = $this->jwt($user, $session);
+				  $permissions = [];
+				  $token = $this->jwt($user, $session, $permissions);
 				  return $this->respond($token);
 			  } else {
 				  return $this->failNotFound('Invalid username or password');

@@ -69,10 +69,9 @@ class BaseController extends ResourceController
 		$this->validation = \Config\Services::validation();
 		$this->secret_key = getenv('JWT_SECRET');
 		$this->decode_token();
-
 	}
 
-	protected function jwt($user, $session): string {
+	protected function jwt($user, $session, $permissions): string {
 		$payload = [
 			"iss" => "THE_CLAIM",
 			"aud" => "THE_AUDIENCE",
@@ -80,7 +79,8 @@ class BaseController extends ResourceController
 			"nbf" => time(),
 			"exp" => time() + 3600,
 			'user' => $user,
-			'session' => $session
+			'session' => $session,
+			'permissions' => $permissions
 		];
 		return JWT::encode($payload, $this->secret_key);
 	}

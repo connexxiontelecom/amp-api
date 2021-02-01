@@ -7,6 +7,7 @@ class Affiliate extends BaseController {
 			$affiliates = $this->affiliate->findAll();
 			$payload = [];
 			foreach ($affiliates as $affiliate) {
+				$affiliate['password'] = '';
 				$upstream_affiliate = $this->affiliate->find($affiliate['upstream_affiliate_id']);
 				$affiliate['upstream_affiliate'] = $upstream_affiliate['username'];
 				array_push($payload, $affiliate);
@@ -290,6 +291,7 @@ class Affiliate extends BaseController {
 		if ($this->is_affiliate_session() || $this->is_admin_session()) {
 			$affiliate = $this->_get_affiliate($affiliate_id);
 			if ($affiliate) {
+				$affiliate['password'] = '';
 				return $this->respond($affiliate);
 			} else {
 				return $this->failNotFound('Affiliate was not found');
