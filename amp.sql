@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 22, 2020 at 08:31 AM
+-- Generation Time: Mar 29, 2021 at 11:44 AM
 -- Server version: 10.4.11-MariaDB
 -- PHP Version: 7.4.6
 
@@ -34,6 +34,7 @@ CREATE TABLE `admin` (
   `username` text NOT NULL,
   `password` text NOT NULL,
   `status` int(11) NOT NULL COMMENT '1=active; 0=inactive',
+  `roles` text NOT NULL,
   `since` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -41,10 +42,10 @@ CREATE TABLE `admin` (
 -- Dumping data for table `admin`
 --
 
-INSERT INTO `admin` (`admin_id`, `firstname`, `lastname`, `username`, `password`, `status`, `since`) VALUES
-(1, 'Super', 'Admin', 'admin', '$2y$12$yyENyeIRx0J3vC9R8QfYpeSCxc/i1vpPiFVfT3u0Nb.EvS6GFdAbq', 1, '2020-10-07 15:13:22'),
-(3, 'Test', 'User', 'testuser', '$2y$10$6Xnw.24AqwMq6A8R3abWQ.dtNhQGAD.JwRYFo4CIzhoKHSllVR81W', 1, '2020-10-08 15:39:24'),
-(4, 'Chijoke', 'Amanambu', 'cj', '$2y$10$WeScZfbKIEwgX6K0viFZIOdVlPCxuR7D2pWYRwL/ELJRLd/wSZr7m', 0, '2020-10-08 16:05:34');
+INSERT INTO `admin` (`admin_id`, `firstname`, `lastname`, `username`, `password`, `status`, `roles`, `since`) VALUES
+(1, 'Super', 'Admin', 'admin', '$2y$12$yyENyeIRx0J3vC9R8QfYpeSCxc/i1vpPiFVfT3u0Nb.EvS6GFdAbq', 1, 's:167:\"adm_r,com_r,aff_r,pro_r,pay_r,log_r,prd_w,adm_w,com_w,aff_w,pro_w,pay_w,log_w,prd_c,adm_c,com_c,aff_c,pro_c,pay_c,log_c,prd_d,adm_d,com_d,aff_d,pro_d,pay_d,log_d,prd_r\";', '2020-10-07 15:13:22'),
+(3, 'Test', 'User', 'testuser', '$2y$10$6Xnw.24AqwMq6A8R3abWQ.dtNhQGAD.JwRYFo4CIzhoKHSllVR81W', 1, 's:108:\",prd_r,prd_w,prd_c,prd_d,adm_r,com_r,aff_r,pro_r,pay_r,log_r,adm_w,adm_c,adm_d,com_w,aff_w,pro_w,pay_w,log_w\";', '2020-10-08 15:39:24'),
+(4, 'Chijoke', 'Amanambu', 'cj', '$2y$10$WeScZfbKIEwgX6K0viFZIOdVlPCxuR7D2pWYRwL/ELJRLd/wSZr7m', 0, 's:0:\"\";', '2020-10-08 16:05:34');
 
 -- --------------------------------------------------------
 
@@ -55,8 +56,9 @@ INSERT INTO `admin` (`admin_id`, `firstname`, `lastname`, `username`, `password`
 CREATE TABLE `admin_log` (
   `admin_log_id` int(11) NOT NULL,
   `admin_id` int(11) NOT NULL,
-  `event` text NOT NULL,
-  `detail` text NOT NULL,
+  `type` text NOT NULL,
+  `title` text NOT NULL,
+  `description` text NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -64,142 +66,8 @@ CREATE TABLE `admin_log` (
 -- Dumping data for table `admin_log`
 --
 
-INSERT INTO `admin_log` (`admin_log_id`, `admin_id`, `event`, `detail`, `created_at`) VALUES
-(1, 1, 'logout', 'success', '2020-10-08 13:50:05'),
-(2, 1, 'login', 'success', '2020-10-08 13:50:28'),
-(3, 1, 'logout', 'success', '2020-10-08 13:50:33'),
-(4, 1, 'login', 'success', '2020-10-08 13:50:36'),
-(5, 1, 'logout', 'success', '2020-10-08 14:15:59'),
-(6, 1, 'logout', 'success', '2020-10-08 14:17:28'),
-(7, 1, 'login', 'success', '2020-10-08 14:17:31'),
-(8, 1, 'logout', 'success', '2020-10-08 14:23:32'),
-(9, 1, 'login', 'success', '2020-10-08 14:23:38'),
-(10, 1, 'logout', 'success', '2020-10-08 14:24:43'),
-(11, 1, 'login', 'success', '2020-10-08 14:24:46'),
-(12, 1, 'logout', 'success', '2020-10-08 14:27:16'),
-(13, 1, 'login', 'success', '2020-10-08 14:27:20'),
-(14, 1, 'logout', 'success', '2020-10-08 14:27:35'),
-(15, 1, 'login', 'success', '2020-10-08 14:27:38'),
-(16, 1, 'logout', 'success', '2020-10-08 15:47:19'),
-(17, 3, 'login', 'success', '2020-10-08 15:47:28'),
-(18, 3, 'logout', 'success', '2020-10-08 15:47:48'),
-(19, 1, 'login', 'success', '2020-10-08 15:47:53'),
-(20, 1, 'add_admin', 'failed to add testuser', '2020-10-08 15:54:05'),
-(21, 1, 'add_admin', 'failed to add admin', '2020-10-08 15:55:07'),
-(22, 1, 'logout', 'success', '2020-10-08 15:57:22'),
-(23, 1, 'login', 'success', '2020-10-08 15:57:25'),
-(24, 1, 'add_admin', 'successfully added cj', '2020-10-08 16:05:34'),
-(25, 1, 'logout', 'success', '2020-10-08 16:05:41'),
-(26, 1, 'login', 'success', '2020-10-08 16:05:58'),
-(27, 1, 'logout', 'success', '2020-10-08 16:07:02'),
-(28, 1, 'login', 'success', '2020-10-12 12:16:27'),
-(29, 1, 'add_admin', 'failed to add admin', '2020-10-12 12:16:42'),
-(30, 1, 'update_admin', 'updated cj', '2020-10-12 13:24:07'),
-(31, 1, 'update_admin', 'updated cj', '2020-10-12 13:24:25'),
-(32, 1, 'logout', 'success', '2020-10-12 13:34:13'),
-(33, 1, 'login', 'success', '2020-10-12 13:35:44'),
-(34, 1, 'logout', 'success', '2020-10-12 13:44:12'),
-(35, 1, 'login', 'success', '2020-10-12 14:00:08'),
-(36, 1, 'logout', 'success', '2020-10-12 14:43:36'),
-(37, 1, 'login', 'success', '2020-10-12 14:43:55'),
-(38, 1, 'login', 'success', '2020-10-13 12:01:02'),
-(39, 1, 'logout', 'success', '2020-10-13 12:47:09'),
-(40, 1, 'login', 'success', '2020-10-13 12:47:32'),
-(41, 1, 'logout', 'success', '2020-10-13 12:47:36'),
-(42, 1, 'login', 'success', '2020-10-13 12:50:24'),
-(43, 1, 'logout', 'success', '2020-10-13 13:03:13'),
-(44, 1, 'login', 'success', '2020-10-13 13:03:30'),
-(45, 1, 'add_product', 'failed to add product', '2020-10-13 15:42:43'),
-(46, 1, 'add_product', 'successfully added Test Product', '2020-10-13 15:42:43'),
-(47, 1, 'add_product', 'failed to add product', '2020-10-13 15:44:55'),
-(48, 1, 'add_product', 'failed to add product', '2020-10-13 15:50:54'),
-(49, 1, 'add_product', 'failed to add Test Product', '2020-10-13 15:50:54'),
-(50, 1, 'login', 'success', '2020-10-16 13:21:23'),
-(51, 1, 'login', 'success', '2020-10-19 17:10:25'),
-(52, 1, 'login', 'success', '2020-10-20 06:51:24'),
-(53, 1, 'add_product', 'failed to add product', '2020-10-20 11:46:36'),
-(54, 1, 'add_product', 'failed to add product', '2020-10-20 12:11:22'),
-(55, 1, 'add_product', 'failed to add Test Product', '2020-10-20 12:11:22'),
-(56, 1, 'add_product', 'failed to add product', '2020-10-20 12:12:18'),
-(57, 1, 'add_product', 'successfully added Test Product 2', '2020-10-20 12:12:18'),
-(58, 1, 'add_product', 'failed to add product', '2020-10-20 12:39:03'),
-(59, 1, 'add_product', 'failed to add Test Product 2', '2020-10-20 12:39:03'),
-(60, 1, 'add_product', 'failed to add product', '2020-10-20 12:39:20'),
-(61, 1, 'add_product', 'successfully added Test Product2', '2020-10-20 12:39:20'),
-(62, 1, 'add_product', 'failed to add product', '2020-10-20 12:53:11'),
-(63, 1, 'add_product', 'failed to add Test Product2', '2020-10-20 12:53:11'),
-(64, 1, 'add_product', 'failed to add product', '2020-10-20 12:53:40'),
-(65, 1, 'add_product', 'failed to add Test Product2', '2020-10-20 12:53:40'),
-(66, 1, 'add_product', 'failed to add product', '2020-10-20 13:18:07'),
-(67, 1, 'add_product', 'successfully added Test Product 3', '2020-10-20 13:18:07'),
-(68, 1, 'add_product', 'failed to add product', '2020-10-20 13:19:38'),
-(69, 1, 'add_product', 'successfully added Test Product 4', '2020-10-20 13:19:38'),
-(70, 1, 'login', 'success', '2020-10-21 07:49:43'),
-(71, 1, 'login', 'success', '2020-10-22 07:48:58'),
-(72, 1, 'add_product', 'failed to add product', '2020-10-22 08:05:28'),
-(73, 1, 'add_product', 'successfully added Test Product 5', '2020-10-22 08:05:28'),
-(74, 1, 'login', 'success', '2020-10-23 08:14:39'),
-(75, 1, 'login', 'success', '2020-10-26 07:55:15'),
-(76, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:08:19'),
-(77, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:08:57'),
-(78, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:11:25'),
-(79, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:11:58'),
-(80, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:14:14'),
-(81, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:26:31'),
-(82, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:26:57'),
-(83, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:28:05'),
-(84, 1, 'update_product', 'successfully updated Test Product 2', '2020-10-26 10:30:55'),
-(85, 1, 'update_product', 'successfully updated Test Product 2', '2020-10-26 10:31:23'),
-(86, 1, 'update_product', 'successfully updated Test Product 2', '2020-10-26 10:35:33'),
-(87, 1, 'update_product', 'successfully updated Test Product 2', '2020-10-26 10:36:08'),
-(88, 1, 'update_product', 'successfully updated Test Product 2', '2020-10-26 10:37:45'),
-(89, 1, 'update_product', 'successfully updated Test Product 2', '2020-10-26 10:39:09'),
-(90, 1, 'update_product', 'successfully updated Test Product 2', '2020-10-26 10:39:25'),
-(91, 1, 'update_product', 'successfully updated Test Product 2', '2020-10-26 10:39:48'),
-(92, 1, 'update_product', 'successfully updated Test Product 2', '2020-10-26 10:43:11'),
-(93, 1, 'update_product', 'successfully updated Test Product 2', '2020-10-26 10:43:59'),
-(94, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:45:30'),
-(95, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:46:14'),
-(96, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:53:44'),
-(97, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:54:50'),
-(98, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:57:01'),
-(99, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:57:28'),
-(100, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:57:35'),
-(101, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:57:50'),
-(102, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:58:15'),
-(103, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 10:59:04'),
-(104, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 11:00:53'),
-(105, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 11:05:07'),
-(106, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 12:25:04'),
-(107, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 12:26:07'),
-(108, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 12:27:40'),
-(109, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 12:27:50'),
-(110, 1, 'update_product', 'successfully updated Test Product', '2020-10-26 12:29:58'),
-(111, 1, 'update_product', 'successfully updated product plan', '2020-10-26 13:35:46'),
-(112, 1, 'update_product', 'successfully updated product plan', '2020-10-26 13:35:58'),
-(113, 1, 'update_product', 'successfully updated product plan', '2020-10-26 13:36:18'),
-(114, 1, 'add_product', 'failed to add Test Product in use', '2020-10-26 13:47:23'),
-(115, 1, 'logout', 'success', '2020-10-26 14:03:35'),
-(116, 1, 'login', 'success', '2020-10-26 14:03:50'),
-(117, 1, 'update_product', 'successfully updated product plan', '2020-10-26 14:05:15'),
-(118, 1, 'login', 'success', '2020-10-27 08:09:58'),
-(119, 1, 'logout', 'success', '2020-10-27 08:10:47'),
-(120, 1, 'login', 'success', '2020-10-27 12:37:36'),
-(121, 1, 'logout', 'success', '2020-10-27 12:37:40'),
-(122, 1, 'login', 'success', '2020-10-27 14:17:01'),
-(123, 1, 'logout', 'success', '2020-10-27 14:30:52'),
-(124, 1, 'login', 'success', '2020-10-28 07:56:24'),
-(125, 1, 'logout', 'success', '2020-10-28 10:00:41'),
-(126, 1, 'login', 'success', '2020-10-28 13:50:55'),
-(127, 1, 'logout', 'success', '2020-10-28 13:50:59'),
-(128, 1, 'login', 'success', '2020-10-28 14:11:20'),
-(129, 1, 'logout', 'success', '2020-10-28 14:11:58'),
-(130, 1, 'login', 'success', '2020-11-02 14:14:32'),
-(131, 1, 'logout', 'success', '2020-11-02 14:31:38'),
-(132, 1, 'login', 'success', '2020-11-02 14:41:31'),
-(133, 1, 'logout', 'success', '2020-11-02 14:50:14'),
-(134, 1, 'login', 'success', '2020-11-02 15:00:56'),
-(135, 1, 'logout', 'success', '2020-11-02 15:11:24');
+INSERT INTO `admin_log` (`admin_log_id`, `admin_id`, `type`, `title`, `description`, `created_at`) VALUES
+(136, 1, 'login', 'Successful Login', 'admin successfully logged into the system', '2021-02-09 14:54:55');
 
 -- --------------------------------------------------------
 
@@ -216,6 +84,7 @@ CREATE TABLE `affiliate` (
   `lastname` text NOT NULL,
   `ref_code` text NOT NULL,
   `status` int(11) NOT NULL DEFAULT 1 COMMENT '0 = inactive; 1 = active; 2 = pending',
+  `verify_code` text NOT NULL,
   `profile` int(11) NOT NULL DEFAULT 0 COMMENT '0 = incomplete; 1 = complete',
   `upstream_affiliate_id` int(11) NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
@@ -225,8 +94,13 @@ CREATE TABLE `affiliate` (
 -- Dumping data for table `affiliate`
 --
 
-INSERT INTO `affiliate` (`affiliate_id`, `username`, `email`, `password`, `firstname`, `lastname`, `ref_code`, `status`, `profile`, `upstream_affiliate_id`, `created_at`) VALUES
-(1, 'cjamanambu', 'oamanambu@yahoo.com', '$2y$10$a1PmgPQNjx3I2gJwo9T5f.Mh3cTOB2FJbBatplsc8LhuvKQVqn25C', 'Onyedika', 'Amanambu', 'vTzmNpXv4F', 1, 0, 0, '2020-12-21 07:08:20');
+INSERT INTO `affiliate` (`affiliate_id`, `username`, `email`, `password`, `firstname`, `lastname`, `ref_code`, `status`, `verify_code`, `profile`, `upstream_affiliate_id`, `created_at`) VALUES
+(1, 'cjamanambu', 'cjamanambu@yahoo.com', '$2y$10$QSIq35v3/Xccqy8ONdC7PeaTN.IySKElNER9OYO0ettoEwkffZ.L.', 'Onyedika', 'Amanambu', 'vTzmNpXv4F', 1, '', 0, 0, '2020-12-21 07:08:20'),
+(2, 'testaffiliate', 'testaffiliate@email.com', '$2y$10$6UMxYCVY9rYfa1lLjR1Sfufm1GZzf8jlMEsM5QhiENp7pxKC7acpS', 'Test', 'Affiliate', 'JBNi2MNjgz', 1, '', 0, 3, '2020-12-22 14:11:03'),
+(3, 'testaffiliate2', 'testaffiliate@test.com', '$2y$10$ZvxJW2Q3nJQ9racsUIuIBuzPrEGtZhNPAX3jHDqTMmCa02rMpxJ.y', 'Test', 'Affiliate', '71WPR0lv47', 1, '', 0, 1, '2021-01-09 11:50:16'),
+(4, 'affiliate', 'affiliate@yahoo.com', '$2y$10$yuvtuZ717ijDblRTJwE7AObeiibDQu9OU1z6EsI5H94fcIkBqmJa.', 'Onyedika', 'Amanambu', 'tjgsvJsnYa', 1, '', 0, 1, '2021-01-19 14:03:34'),
+(5, 'johndoe', 'johndoe@email.com', '$2y$10$9VgYojRcDjlpZduN1tqd0OgZStEkxHRx/mGdfsZoH6iBiZfnDKR6q', 'John', 'Doe', 'QMPiW08wsl', 1, '', 0, 0, '2021-01-21 16:07:01'),
+(28, 'oamanambu', 'oamanambu@yahoo.com', '$2y$10$PxkFGnjQP119Wrrclpmn5OXHtp/BTuKY.RjZpYGHuRIDVk7w3J6Py', 'Onyedika', 'Amanambu', 'zMKWLBaeJ6', 1, 'tw8Ox98CoK', 0, 0, '2021-01-28 14:33:32');
 
 -- --------------------------------------------------------
 
@@ -237,16 +111,24 @@ INSERT INTO `affiliate` (`affiliate_id`, `username`, `email`, `password`, `first
 CREATE TABLE `affiliate_info` (
   `affiliate_info_id` int(11) NOT NULL,
   `affiliate_id` int(11) NOT NULL,
-  `phone` text NOT NULL,
-  `dob` date NOT NULL,
-  `company` text NOT NULL,
-  `website` text NOT NULL,
-  `gender` text NOT NULL,
-  `address` text NOT NULL,
-  `city` text NOT NULL,
-  `state` text NOT NULL,
-  `country` text NOT NULL
+  `phone` text DEFAULT NULL,
+  `dob` date DEFAULT NULL,
+  `gender` text DEFAULT NULL,
+  `address` text DEFAULT NULL,
+  `country` text DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `affiliate_info`
+--
+
+INSERT INTO `affiliate_info` (`affiliate_info_id`, `affiliate_id`, `phone`, `dob`, `gender`, `address`, `country`) VALUES
+(1, 2, '09096000024', '1993-12-23', 'male', 'Number 3, Misratah Street, Wuse 2 Abuja', 'Nigeria'),
+(2, 1, '07068721317', '1993-12-23', 'female', 'Number 3 Misratah Street, Wuse 2, Abuja', 'Republic of Nigeria'),
+(3, 3, '08037044888', '1983-06-15', 'female', '2A Iller Crescent, Off Katsina Ala, Maitama', 'Nigeria'),
+(4, 3, '08037044888', '1983-06-15', 'male', '2A Iller Crescent, Off Katsina Ala, Maitama', 'Nigeria'),
+(5, 3, '08037044888', '1983-06-15', 'male', '2A Iller Crescent, Off Katsina Ala, Maitama', 'Nigeria'),
+(6, 5, '2045586316', '2021-01-22', 'male', '120 Dafoe Road West', 'Canada');
 
 -- --------------------------------------------------------
 
@@ -312,6 +194,16 @@ CREATE TABLE `bank` (
   `bank_acc_number` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+--
+-- Dumping data for table `bank`
+--
+
+INSERT INTO `bank` (`bank_id`, `affiliate_id`, `bank_name`, `bank_acc_name`, `bank_acc_number`) VALUES
+(1, 2, 'Zenith Bank', 'Onyedika Amanambu', '2008107965'),
+(2, 1, 'Zenith Bank', 'Onyedika Amanambu', '20081079656'),
+(3, 3, 'Zenith Bank', 'Onyedikachukwu Amanambu', '2008107965'),
+(4, 3, 'Zenith Bank', 'Onyedikachukwu Chijioke Amanambu', '2008107965');
+
 -- --------------------------------------------------------
 
 --
@@ -335,7 +227,7 @@ CREATE TABLE `commission` (
 
 INSERT INTO `commission` (`commission_id`, `num_gens`, `current_gen`, `gen_1`, `gen_2`, `gen_3`, `gen_4`, `gen_5`) VALUES
 (1, 1, 1, '60', '40', '0', '0', '0'),
-(2, 2, 0, '50', '30', '20', '0', '0'),
+(2, 2, 0, '50', '35', '15', '0', '0'),
 (3, 3, 0, '40', '30', '20', '10', '0'),
 (4, 4, 0, '30', '20', '18', '17', '15');
 
@@ -351,9 +243,9 @@ CREATE TABLE `product` (
   `url` text DEFAULT NULL,
   `category` text NOT NULL,
   `description` text NOT NULL,
-  `num_plans` int(11) NOT NULL,
-  `logo` text NOT NULL,
-  `status` int(11) NOT NULL COMMENT '0=unpublished; 1=published\r\n',
+  `num_plans` int(11) NOT NULL DEFAULT 0,
+  `logo` text DEFAULT NULL,
+  `status` int(11) NOT NULL DEFAULT 1 COMMENT '0=unpublished; 1=published\r\n',
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
@@ -362,7 +254,7 @@ CREATE TABLE `product` (
 --
 
 INSERT INTO `product` (`product_id`, `name`, `url`, `category`, `description`, `num_plans`, `logo`, `status`, `created_at`) VALUES
-(1, 'ihumane', 'https://ihumane.net', 'Software', '', 3, '', 1, '2020-12-16 10:58:33');
+(12, 'ihumane', 'https://ihumane.net', 'Software', '', 1, 'ihumane-logo-2.png', 1, '2021-01-27 10:36:26');
 
 -- --------------------------------------------------------
 
@@ -448,17 +340,16 @@ CREATE TABLE `product_plan` (
   `plan_name` text NOT NULL,
   `plan_price` text NOT NULL,
   `plan_link` text NOT NULL,
-  `plan_commission` text NOT NULL
+  `plan_commission` text NOT NULL,
+  `plan_slug` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `product_plan`
 --
 
-INSERT INTO `product_plan` (`product_plan_id`, `product_id`, `plan_name`, `plan_price`, `plan_link`, `plan_commission`) VALUES
-(2, 1, 'Free Trial', '0', 'http://ihumane.com/free-trial', '0'),
-(3, 1, 'Free Trial', '0', 'http://ihumane.com/free-trial/2', '0'),
-(4, 1, 'Basic', '20000', 'http://ihumane.com/basic', '2000');
+INSERT INTO `product_plan` (`product_plan_id`, `product_id`, `plan_name`, `plan_price`, `plan_link`, `plan_commission`, `plan_slug`) VALUES
+(11, 12, 'Basic', '20000', 'https://ihumane.net/basic', '2500', 'def4245f');
 
 --
 -- Indexes for dumped tables
@@ -532,25 +423,25 @@ ALTER TABLE `product_plan`
 -- AUTO_INCREMENT for table `admin`
 --
 ALTER TABLE `admin`
-  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
+  MODIFY `admin_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `admin_log`
 --
 ALTER TABLE `admin_log`
-  MODIFY `admin_log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=136;
+  MODIFY `admin_log_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=137;
 
 --
 -- AUTO_INCREMENT for table `affiliate`
 --
 ALTER TABLE `affiliate`
-  MODIFY `affiliate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `affiliate_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT for table `affiliate_info`
 --
 ALTER TABLE `affiliate_info`
-  MODIFY `affiliate_info_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `affiliate_info_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `agent_log`
@@ -562,19 +453,19 @@ ALTER TABLE `agent_log`
 -- AUTO_INCREMENT for table `bank`
 --
 ALTER TABLE `bank`
-  MODIFY `bank_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `bank_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `commission`
 --
 ALTER TABLE `commission`
-  MODIFY `commission_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `commission_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `product`
 --
 ALTER TABLE `product`
-  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `product_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `product_log`
@@ -586,7 +477,7 @@ ALTER TABLE `product_log`
 -- AUTO_INCREMENT for table `product_plan`
 --
 ALTER TABLE `product_plan`
-  MODIFY `product_plan_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `product_plan_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -14,6 +14,7 @@ namespace App\Controllers;
  * @package CodeIgniter
  */
 
+use App\Models\AdminLogModel;
 use App\Models\AdminModel;
 use App\Models\AffiliateInfoModel;
 use App\Models\AffiliateModel;
@@ -42,6 +43,7 @@ class BaseController extends ResourceController
 	protected $commission;
 	protected $product;
 	protected $product_plan;
+	protected $admin_log;
 	protected $validation;
 	protected $decoded_token;
 
@@ -66,6 +68,7 @@ class BaseController extends ResourceController
 		$this->commission = new CommissionModel();
 		$this->product = new ProductModel();
 		$this->product_plan = new ProductPlanModel();
+		$this->admin_log = new AdminLogModel();
 		$this->validation = \Config\Services::validation();
 		$this->secret_key = getenv('JWT_SECRET');
 		$this->decode_token();

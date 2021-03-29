@@ -44,7 +44,7 @@ class Product extends BaseController {
 			if ($this->validation->withRequest($this->request)->run()) {
 				if (!$this->check_product_name_exists($this->request->getPost('name'))) {
 					$logo = $this->request->getFile('logo');
-					$logo->move(ROOTPATH.'public/uploads');
+					$logo->move(ROOTPATH.'public/uploads/products');
 					$product = [
 						'name' => $this->request->getPost('name'),
 						'url' => $this->request->getPost('url'),
@@ -137,10 +137,10 @@ class Product extends BaseController {
 				$product = $this->product->find($this->request->getPost('product_id'));
 				if ($product) {
 					if ($product['logo']) {
-						unlink(ROOTPATH.'public/uploads/'.$product['logo']);
+						unlink(ROOTPATH.'public/uploads/products/'.$product['logo']);
 					}
 					$logo = $this->request->getFile('logo');
-					$logo->move(ROOTPATH.'public/uploads');
+					$logo->move(ROOTPATH.'public/uploads/products');
 					$product = [
 						'product_id' => $this->request->getPost('product_id'),
 						'logo' => $logo->getClientName(),
@@ -180,7 +180,7 @@ class Product extends BaseController {
 			if ($this->validation->withRequest($this->request)->run()) {
 				$product = $this->product->find($this->request->getPost('product_id'));
 				if ($product) {
-					unlink(ROOTPATH.'public/uploads/'.$product['logo']);
+					unlink(ROOTPATH.'public/uploads/products/'.$product['logo']);
 					$product = [
 						'product_id' => $this->request->getPost('product_id'),
 						'logo' => '',

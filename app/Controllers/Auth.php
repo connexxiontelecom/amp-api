@@ -20,6 +20,13 @@ class Auth extends BaseController {
 			  $user['password'] = '';
 			  $permissions = explode(',', unserialize($user['roles']));
 			  $token = $this->jwt($user, $session, $permissions);
+//			  $log = [
+//			  	'admin_id' => $user['admin_id'],
+//				  'type' => 'login',
+//				  'title' => 'Successful Login',
+//				  'description' => $user['username'].' successfully logged into the system'
+//			  ];
+//			  $this->admin_log->save($log);
 			  return $this->respond($token);
 		  } else {
 			  $user = $this->affiliate->where('username', $username)->first();
