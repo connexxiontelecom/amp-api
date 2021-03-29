@@ -2,6 +2,10 @@
 
 class Affiliate extends BaseController {
 
+  function __construct() {
+    $this->decode_token();
+  }
+
 	function all_affiliates() {
 		if ($this->is_admin_session()) {
 			$affiliates = $this->affiliate->findAll();

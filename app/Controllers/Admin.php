@@ -2,6 +2,10 @@
 
 class Admin extends BaseController {
 
+  function __construct() {
+    $this->decode_token();
+  }
+
 	function all_admins() {
 		if ($this->is_admin_session()) {
 			$admins = $this->admin->findAll();

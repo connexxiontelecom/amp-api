@@ -71,7 +71,7 @@ class BaseController extends ResourceController
 		$this->admin_log = new AdminLogModel();
 		$this->validation = \Config\Services::validation();
 		$this->secret_key = getenv('JWT_SECRET');
-		$this->decode_token();
+//		$this->decode_token();
 	}
 
 	protected function jwt($user, $session, $permissions): string {
@@ -124,14 +124,14 @@ class BaseController extends ResourceController
 		return false;
 	}
 
-	private function get_authorization_header() {
+	private function get_authorization_header(): string {
 		$headers = array_map(function($header) {
 			return $header->getValueLine();
 		}, $this->request->getHeaders());
 		return $headers['Authorization'];
 	}
 
-	private function decode_token(): bool {
+	protected function decode_token(): bool {
 		$authorization = $this->get_authorization_header();
 		if ($authorization) {
 			$authorization = explode(" ", $authorization);
