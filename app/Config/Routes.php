@@ -32,6 +32,8 @@ $routes->setAutoRoute(true);
 // route since we don't have to scan directories.
 $routes->get('/', 'Home::index');
 
+$routes->post('new_product_sale', 'ProductSale::add_product_sale');
+
 /**
  * --------------------------------------------------------------------
  * Additional Routing

@@ -22,7 +22,15 @@ use App\Models\BankModel;
 use App\Models\CommissionModel;
 use App\Models\ProductModel;
 use App\Models\ProductPlanModel;
+
+use App\Models\ProductSaleModel;
+use CodeIgniter\Controller;
+use CodeIgniter\HTTP\RequestInterface;
+use CodeIgniter\HTTP\ResponseInterface;
+
 use CodeIgniter\RESTful\ResourceController;
+use Psr\Log\LoggerInterface;
+
 use Firebase\JWT\JWT;
 
 class BaseController extends ResourceController
@@ -43,15 +51,20 @@ class BaseController extends ResourceController
 	protected $commission;
 	protected $product;
 	protected $product_plan;
+	protected $product_sale;
 	protected $admin_log;
 	protected $validation;
 	protected $decoded_token;
 
 	private $secret_key;
-	/**
-	 * Constructor.
-	 */
-	public function initController(\CodeIgniter\HTTP\RequestInterface $request, \CodeIgniter\HTTP\ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
+
+  /**
+   * Constructor.
+   * @param RequestInterface $request
+   * @param ResponseInterface $response
+   * @param \Psr\Log\LoggerInterface $logger
+   */
+	public function initController(RequestInterface $request, ResponseInterface $response, \Psr\Log\LoggerInterface $logger)
 	{
 		// Do Not Edit This Line
 		parent::initController($request, $response, $logger);
@@ -69,9 +82,10 @@ class BaseController extends ResourceController
 		$this->product = new ProductModel();
 		$this->product_plan = new ProductPlanModel();
 		$this->admin_log = new AdminLogModel();
+		$this->product_sale = new ProductSaleModel();
 		$this->validation = \Config\Services::validation();
 		$this->secret_key = getenv('JWT_SECRET');
-//		$this->decode_token();
+		$this->decode_token();
 	}
 
 	protected function jwt($user, $session, $permissions): string {
@@ -125,13 +139,19 @@ class BaseController extends ResourceController
 	}
 
 	private function get_authorization_header(): string {
+	  $authorization_header = '';
 		$headers = array_map(function($header) {
 			return $header->getValueLine();
 		}, $this->request->getHeaders());
-		return $headers['Authorization'];
+
+		if (array_key_exists('Authorization', $headers)) {
+		  $authorization_header = $headers['Authorization'];
+    }
+
+    return $authorization_header;
 	}
 
-	protected function decode_token(): bool {
+	private function decode_token(): bool {
 		$authorization = $this->get_authorization_header();
 		if ($authorization) {
 			$authorization = explode(" ", $authorization);

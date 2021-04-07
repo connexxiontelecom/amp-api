@@ -2,10 +2,6 @@
 
 class Commission extends BaseController {
 
-  function __construct() {
-    $this->decode_token();
-  }
-
 	function get_commissions() {
 		if ($this->is_admin_session()) {
 			$current_generation = $this->commission->where('current_gen', 1)->first();

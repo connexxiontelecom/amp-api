@@ -3,10 +3,6 @@
 
 class Product extends BaseController {
 
-  function __construct() {
-    $this->decode_token();
-  }
-
 	function all_products() {
 		if ($this->is_admin_session() || $this->is_affiliate_session()) {
 			$products = $this->product->findAll();

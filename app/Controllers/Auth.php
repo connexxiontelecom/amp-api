@@ -93,4 +93,38 @@ class Auth extends BaseController {
   		return $this->fail($this->validation->getErrors());
 	  }
   }
+
+  function verify_account() {
+    $this->validation->setRules([
+      'verify_code' => 'required'
+    ]);
+    if ($this->validation->withRequest($this->request)->run()) {
+      $affiliate = $this->affiliate->where('verify_code', $this->request->getPost('verify_code'))->first();
+      if ($affiliate) {
+        $payload = ['verified' => false];
+        if ($affiliate['profile'] == 1) {
+          return $this->respond($payload);
+        }
+        $affiliate = [
+          'affiliate_id' => $affiliate['affiliate_id'],
+          'profile' => 1
+        ];
+        try {
+          $save = $this->affiliate->save($affiliate);
+        } catch (\Exception $ex) {
+          return $this->fail($ex->getMessage());
+        }
+        if ($save) {
+          $payload['verified'] = true;
+          return $this->respondUpdated($payload);
+        } else {
+          return $this->fail('Affiliate could not be verified');
+        }
+      } else {
+        return $this->failNotFound('Affiliate account not found');
+      }
+    } else {
+      return $this->fail($this->validation->getErrors());
+    }
+  }
 }
