@@ -35,6 +35,7 @@ class Product extends BaseController {
 			$this->validation->setRules([
 				'name' => 'required',
 				'category' => 'required',
+				'registration_link' => 'required',
 				'logo' => [
 					'uploaded[logo]',
 					'mime_in[logo,image/jpg,image/jpeg,image/gif,image/png]',
@@ -48,6 +49,7 @@ class Product extends BaseController {
 					$product = [
 						'name' => $this->request->getPost('name'),
 						'url' => $this->request->getPost('url'),
+            'registration_link' => $this->request->getPost('registration_link'),
 						'category' => $this->request->getPost('category'),
 						'logo' => $logo->getClientName(),
 						'description' => $this->request->getPost('description'),
@@ -80,6 +82,7 @@ class Product extends BaseController {
 				'product_id' => 'required',
 				'name' => 'required',
 				'category' => 'required',
+        'registration_link' => 'required'
 			]);
 			if ($this->validation->withRequest($this->request)->run()) {
 				$product = $this->check_product_name_exists($this->request->getPost('name'));
@@ -92,6 +95,7 @@ class Product extends BaseController {
 					'product_id' => $this->request->getPost('product_id'),
 					'name' => $this->request->getPost('name'),
 					'url' => $this->request->getPost('url'),
+          'registration_link' => $this->request->getPost('registration_link'),
 					'category' => $this->request->getPost('category'),
 					'description' => $this->request->getPost('description'),
 				];

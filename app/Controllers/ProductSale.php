@@ -13,17 +13,17 @@ class ProductSale extends BaseController {
       'year' => 'required',
     ]);
     if ($this->validation->withRequest($this->request)->run()) {
-      $product = $this->product->find($this->request->getPost('product_id'));
-      $affiliate = $this->affiliate->where('ref_code', $this->request->getPost('referral_code'))->first();
+      $product = $this->product->find($this->request->getVar('product_id'));
+      $affiliate = $this->affiliate->where('ref_code', $this->request->getVar('referral_code'))->first();
       if ($product && $affiliate) {
         $product_sale_data = [
-          'referral_code' => $this->request->getPost('referral_code'),
-          'product_id' => $this->request->getPost('product_id'),
-          'amount' => $this->request->getPost('amount'),
-          'company_name' => $this->request->getPost('company_name'),
-          'contact_email' => $this->request->getPost('contact_email'),
-          'month' => $this->request->getPost('month'),
-          'year' => $this->request->getPost('year'),
+          'referral_code' => $this->request->getVar('referral_code'),
+          'product_id' => $this->request->getVar('product_id'),
+          'amount' => $this->request->getVar('amount'),
+          'company_name' => $this->request->getVar('company_name'),
+          'contact_email' => $this->request->getVar('contact_email'),
+          'month' => $this->request->getVar('month'),
+          'year' => $this->request->getVar('year'),
         ];
         $saved = $this->product_sale->save($product_sale_data);
         if ($saved) {
