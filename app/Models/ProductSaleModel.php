@@ -3,6 +3,6 @@ use CodeIgniter\Model;
 
 class ProductSaleModel extends Model {
   protected $table = 'product_sale';
-  protected $allowedFields = ['referral_code', 'amount', 'product_id', 'company_name', 'contact_email', 'month', 'year'];
+  protected $allowedFields = ['referral_code', 'amount', 'product_id', 'company_name', 'contact_email', 'status', 'month', 'year'];
   protected $primaryKey = 'product_sale_id';
 }
