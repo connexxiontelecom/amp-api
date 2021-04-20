@@ -40,6 +40,37 @@ class ProductSale extends BaseController {
     }
   }
 
+  function get_monthly_commission($affiliate_ref_code) {
+    if ($this->is_admin_session() || $this->is_affiliate_session()) {
+      $affiliate = $this->affiliate->where('ref_code', $affiliate_ref_code)->first();
+      if ($affiliate) {
+        $total_commission = 0;
+        $current_month = date('m');
+        $current_year = date('Y');
+        $product_sales = $this->product_sale->where([
+          'referral_code' => $affiliate_ref_code,
+          'month' => $current_month,
+          'year' => $current_year
+        ])->findAll();
+        $i = 0;
+        foreach ($product_sales as $product_sale) {
+          if ($i == 4) {
+            // every fifth commission for that month
+            $i = 0;
+            $total_commission += $product_sale['amount'];
+          } else {
+            $total_commission += ($product_sale['amount'] * 0.10);
+          }
+        }
+        return $this->respond($total_commission);
+      } else {
+        return $this->fail('The affiliate marketer does not exist on AMP');
+      }
+    } else {
+      return $this->fail($this->validation->getErrors());
+    }
+  }
+
   function add_product_sale() {
     $this->validation->setRules([
       'product_id' => 'required',
