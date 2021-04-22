@@ -35,6 +35,7 @@ $routes->get('/', 'Home::index');
 $routes->get('product-sales', 'ProductSale::all_product_sales');
 $routes->get('affiliate-product-sales/(:any)', 'ProductSale::affiliate_product_sales/$1');
 $routes->get('get-monthly-commission/(:any)', 'ProductSale::get_monthly_commission/$1');
+$routes->get('get-yearly-commission/(:any)', 'ProductSale::get_yearly_commission/$1');
 $routes->post('new_product_sale', 'ProductSale::add_product_sale');
 
 /**
