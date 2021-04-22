@@ -12,6 +12,15 @@ class Product extends BaseController {
 		}
 	}
 
+	function all_affiliate_products() {
+	  if ($this->is_affiliate_session()) {
+	    $products = $this->product->where('status', 1)->findAll();
+	    return $this->respond($products);
+    } else {
+	    return $this->failUnauthorized();
+    }
+  }
+
 	function get_product($product_id) {
 		if ($this->is_admin_session() || $this->is_affiliate_session()) {
 			$product = $this->product->find($product_id);
