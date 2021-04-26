@@ -172,7 +172,7 @@ class Product extends BaseController {
 						];
 						return $this->respond($payload);
 					} else {
-						return $this->fail('Product could not be added');
+						return $this->fail('Product logo could not be updated');
 					}
 				} else {
 					return $this->failNotFound('Product was not found');

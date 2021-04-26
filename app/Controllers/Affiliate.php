@@ -185,7 +185,103 @@ class Affiliate extends BaseController {
 		}
 	}
 
-	function add_affiliate() {
+  function update_image() {
+    if ($this->is_affiliate_session()) {
+      $this->validation->setRules([
+        'affiliate_id' => 'required',
+        'profile_pic' => [
+          'uploaded[profile_pic]',
+          'mime_in[profile_pic,image/jpg,image/jpeg,image/gif,image/png]',
+          'max_size[profile_pic,2097152]'
+        ]
+      ]);
+      if ($this->validation->withRequest($this->request)->run()) {
+        $affiliate = $this->affiliate->find($this->request->getPost('affiliate_id'));
+        if ($affiliate) {
+          if ($affiliate['profile_pic']) {
+            unlink(ROOTPATH.'public/uploads/affiliates/'.$affiliate['profile_pic']);
+          }
+          $profile_pic = $this->request->getFile('profile_pic');
+          $profile_pic->move(ROOTPATH.'public/uploads/affiliates');
+          $affiliate = [
+            'affiliate_id' => $this->request->getPost('affiliate_id'),
+            'profile_pic' => $profile_pic->getClientName(),
+          ];
+          try {
+            $save = $this->affiliate->save($affiliate);
+          } catch (\Exception $ex) {
+            return $this->fail($ex->getMessage());
+          }
+          if ($save) {
+            $affiliate = $this->_get_affiliate($this->request->getPost('affiliate_id'));
+            $session = [
+              'admin'=> false,
+              'affiliate' => true,
+            ];
+            $payload = [
+              'user' => $affiliate,
+              'session' => $session
+            ];
+            return $this->respond($payload);
+          } else {
+            return $this->fail('Affiliate profile picture could not be updated');
+          }
+        } else {
+          return $this->failNotFound('Affiliate was not found');
+        }
+      } else {
+        return $this->fail('Form validation failed. Please confirm profile picture was uploaded correctly');
+      }
+    } else {
+      return $this->failUnauthorized();
+    }
+  }
+
+  function remove_image() {
+    if ($this->is_affiliate_session()) {
+      $this->validation->setRules([
+        'affiliate_id' => 'required',
+      ]);
+      if ($this->validation->withRequest($this->request)->run()) {
+        $affiliate = $this->affiliate->find($this->request->getPost('affiliate_id'));
+        if ($affiliate) {
+          unlink(ROOTPATH.'public/uploads/affiliates/'.$affiliate['profile_pic']);
+          $affiliate = [
+            '$affiliate_id' => $this->request->getPost('$affiliate_id'),
+            'profile_pic' => '',
+          ];
+          try {
+            $save = $this->affiliate->save($affiliate);
+          } catch (\Exception $ex) {
+            return $this->fail($ex->getMessage());
+          }
+          if ($save) {
+            $affiliate = $this->_get_affiliate($this->request->getPost('affiliate_id'));
+            $session = [
+              'admin'=> false,
+              'affiliate' => true,
+            ];
+            $payload = [
+              'user' => $affiliate,
+              'session' => $session
+            ];
+            return $this->respond($payload);
+          } else {
+            return $this->fail('Affiliate profile picture could not be updated');
+          }
+        } else {
+          return $this->failNotFound('Affiliate was not found');
+        }
+      } else {
+        return $this->fail($this->validation->getErrors());
+      }
+    } else {
+      return $this->failUnauthorized();
+    }
+  }
+
+
+  function add_affiliate() {
 		if ($this->is_admin_session()) {
 			$this->validation->setRules([
 				'firstname' => 'required',
@@ -471,7 +567,7 @@ class Affiliate extends BaseController {
 		}
 	}
 
-	public function change_password() {
+	function change_password() {
 		if ($this->is_affiliate_session()) {
 			$this->validation->setRules([
 				'affiliate_id' => 'required',
