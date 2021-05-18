@@ -79,6 +79,18 @@ class Auth extends BaseController {
 					  return $this->fail($ex->getMessage());
 				  }
 				  if ($save) {
+//				    $this->email->initialize();
+				    $this->email->setFrom($this->from_email, $this->from_name);
+				    $this->email->setTo($this->request->getPost('email'));
+            $this->email->setSubject('Verify your email address on AMP');
+				    $this->email->setMessage('<p>Verification Mail is sent</p>');
+				    if ($this->email->send()) {
+				      echo 'sent';
+            } else {
+              $data = $this->email->printDebugger(['headers']);
+              print_r($data);
+            }
+
 					  return $this->respondCreated('Affiliate account was created. Login to your account');
 				  } else {
 					  return $this->fail('Affiliate account could not be created');

@@ -55,6 +55,9 @@ class BaseController extends ResourceController
 	protected $admin_log;
 	protected $validation;
 	protected $decoded_token;
+  protected $email;
+  protected $from_name;
+  protected $from_email;
 
 	private $secret_key;
 
@@ -84,6 +87,9 @@ class BaseController extends ResourceController
 		$this->admin_log = new AdminLogModel();
 		$this->product_sale = new ProductSaleModel();
 		$this->validation = \Config\Services::validation();
+		$this->email = \Config\Services::email();
+		$this->from_name = getenv('FROM_NAME');
+		$this->from_email = getenv('FROM_EMAIL');
 		$this->secret_key = getenv('JWT_SECRET');
 		$this->decode_token();
 	}
@@ -164,4 +170,15 @@ class BaseController extends ResourceController
 		}
 		return false;
 	}
+
+	protected function getEmailConfig(): array {
+	  $config['protocol'] = getenv('EMAIL_PROTOCOL');
+	  $config['SMTPHost'] = getenv('SMTP_HOST');
+	  $config['SMTPUser'] = getenv('SMTP_USER');
+	  $config['SMTPPass'] = getenv('SMTP_PASS');
+	  $config['SMTPPort'] = getenv('SMTP_PORT');
+	  $config['SMTPCrypto'] = getenv('SMTP_CRYPTO');
+	  $config['mailType'] = getenv('MAIL_TYPE');
+	  return $config;
+  }
 }
