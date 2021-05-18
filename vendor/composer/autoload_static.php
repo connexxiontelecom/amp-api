@@ -34,6 +34,7 @@ class ComposerStaticInit80adbdf683c2d330315992f835b3ab59
         array (
             'Psr\\Log\\' => 8,
             'Prophecy\\' => 9,
+            'PHPMailer\\PHPMailer\\' => 20,
         ),
         'L' => 
         array (
@@ -86,6 +87,10 @@ class ComposerStaticInit80adbdf683c2d330315992f835b3ab59
         'Prophecy\\' => 
         array (
             0 => __DIR__ . '/..' . '/phpspec/prophecy/src/Prophecy',
+        ),
+        'PHPMailer\\PHPMailer\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/phpmailer/phpmailer/src',
         ),
         'Laminas\\ZendFrameworkBridge\\' => 
         array (

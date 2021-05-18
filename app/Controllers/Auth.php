@@ -1,5 +1,8 @@
 <?php namespace App\Controllers;
 
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
 class Auth extends BaseController {
 
   function login() {
@@ -79,18 +82,24 @@ class Auth extends BaseController {
 					  return $this->fail($ex->getMessage());
 				  }
 				  if ($save) {
-//				    $this->email->initialize();
-				    $this->email->setFrom($this->from_email, $this->from_name);
-				    $this->email->setTo($this->request->getPost('email'));
-            $this->email->setSubject('Verify your email address on AMP');
-				    $this->email->setMessage('<p>Verification Mail is sent</p>');
-				    if ($this->email->send()) {
-				      echo 'sent';
-            } else {
-              $data = $this->email->printDebugger(['headers']);
-              print_r($data);
-            }
+            try {
+              $this->email->isSMTP();
+              $this->email->Host = 'connexxiontelecom.com';
+              $this->email->SMTPAuth = true;
+              $this->email->Port = 465;
+              $this->email->Username = 'support@connexxiontelecom.com';
+              $this->email->Password = 'RM*Kv7J=p=[-FUOY}6';
 
+              $this->email->setFrom($this->from_email, $this->from_name);
+              $this->email->addAddress($this->request->getPost('email'));
+              $this->email->isHTML(true);
+              $this->email->Subject = 'Verify your email address on AMP';
+              $this->email->Body = '<p>Verification Mail is sent</p>';
+              $this->email->send();
+
+            } catch (Exception $e) {
+              print_r("Message could not be sent. Mailer Error: {$this->email->ErrorInfo}");
+            }
 					  return $this->respondCreated('Affiliate account was created. Login to your account');
 				  } else {
 					  return $this->fail('Affiliate account could not be created');

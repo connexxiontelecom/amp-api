@@ -31,6 +31,12 @@ use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Psr\Log\LoggerInterface;
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+//require 'vendor/autoload.php';
+
 use Firebase\JWT\JWT;
 
 class BaseController extends ResourceController
@@ -87,7 +93,7 @@ class BaseController extends ResourceController
 		$this->admin_log = new AdminLogModel();
 		$this->product_sale = new ProductSaleModel();
 		$this->validation = \Config\Services::validation();
-		$this->email = \Config\Services::email();
+		$this->email = new PHPMailer(true);
 		$this->from_name = getenv('FROM_NAME');
 		$this->from_email = getenv('FROM_EMAIL');
 		$this->secret_key = getenv('JWT_SECRET');
