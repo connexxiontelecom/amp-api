@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+
 <head>
   <meta charset="utf-8">
   <meta name="x-apple-disable-message-reformatting">
@@ -12,7 +13,7 @@
     td,th,div,p,a,h1,h2,h3,h4,h5,h6 {font-family: "Segoe UI", sans-serif; mso-line-height-rule: exactly;}
   </style>
   <![endif]-->
-  <title>Verify your email address on AMP</title>
+  <title>Welcome to AMP 👋</title>
   <link href="https://fonts.googleapis.com/css?family=Montserrat:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,200;1,300;1,400;1,500;1,600;1,700" rel="stylesheet" media="screen">
   <style>
       .hover-underline:hover {
@@ -77,8 +78,8 @@
 </head>
 
 <body style="margin: 0; padding: 0; width: 100%; word-break: break-word; -webkit-font-smoothing: antialiased; --bg-opacity: 1; background-color: #eceff1; background-color: rgba(236, 239, 241, var(--bg-opacity));">
-<div style="display: none;">Verify your email address on AMP</div>
-<div role="article" aria-roledescription="email" aria-label="Verify Email Address" lang="en">
+<div style="display: none;">We are pleased to welcome you to AMP</div>
+<div role="article" aria-roledescription="email" aria-label="Welcome to AMP 👋" lang="en">
   <table style="font-family: Montserrat, -apple-system, 'Segoe UI', sans-serif; width: 100%;" width="100%" cellpadding="0" cellspacing="0" role="presentation">
     <tr>
       <td align="center" style="--bg-opacity: 1; background-color: #eceff1; background-color: rgba(236, 239, 241, var(--bg-opacity)); font-family: Montserrat, -apple-system, 'Segoe UI', sans-serif;" bgcolor="rgba(236, 239, 241, var(--bg-opacity))">
@@ -215,18 +216,35 @@ BWPM/wPL+GibHaSkdgAAAABJRU5ErkJggg=="
               <table style="font-family: 'Montserrat',Arial,sans-serif; width: 100%;" width="100%" cellpadding="0" cellspacing="0" role="presentation">
                 <tr>
                   <td class="sm-px-24" style="--bg-opacity: 1; background-color: #ffffff; background-color: rgba(255, 255, 255, var(--bg-opacity)); border-radius: 4px; font-family: Montserrat, -apple-system, 'Segoe UI', sans-serif; font-size: 14px; line-height: 24px; padding: 48px; text-align: left; --text-opacity: 1; color: #626262; color: rgba(98, 98, 98, var(--text-opacity));" bgcolor="rgba(255, 255, 255, var(--bg-opacity))" align="left">
-                    <p style="font-weight: 600; font-size: 18px; margin-bottom: 0;">Hey,</p>
+                    <p style="font-weight: 600; font-size: 18px; margin-bottom: 0;">Hey</p>
                     <p style="font-weight: 700; font-size: 20px; margin-top: 0; --text-opacity: 1; color: #ff5850; color: rgba(255, 88, 80, var(--text-opacity));"><?=$name?></p>
-                    <p class="sm-leading-32" style="font-weight: 600; font-size: 20px; margin: 0 0 16px; --text-opacity: 1; color: #263238; color: rgba(38, 50, 56, var(--text-opacity));">
-                      Thanks for signing up! 👋
+                    <p class="sm-leading-32" style="font-weight: 600; font-size: 20px; margin: 0 0 24px; --text-opacity: 1; color: #263238; color: rgba(38, 50, 56, var(--text-opacity));">
+                      🏆 We are pleased to welcome you to AMP!
                     </p>
-                    <p style="margin: 0 0 24px;">
-                      Please verify your email address so we know it's really you and so we can send you important information about your AMP account
+                    <p style="margin: 24px 0;">
+                      Connexxion Telecom's Affiliate Marketing Portal
+                      <span style="font-weight: 600;">AMP</span>
+                      enables you to earn a commission when you connect people to our products and services 🤩.
                     </p>
+                    <p style="font-weight: 500; font-size: 16px; margin-bottom: 0;">How can you use AMP to earn money passively?</p>
+                    <ul style="margin-bottom: 24px;">
+                      <li>
+                        Sign in to gain access to your account on AMP.
+                      </li>
+                      <li>
+                        View our products, copy your referral link and give to your customers.
+                      </li>
+                      <li>
+                        If a product is bought with your referral link, you will get a 10% commission.
+                      </li>
+                      <li>
+                        Every month you will receive a payout of your accumulated commission payout for that month.  🤟🏻
+                      </li>
+                    </ul>
                     <table style="font-family: 'Montserrat',Arial,sans-serif;" cellpadding="0" cellspacing="0" role="presentation">
                       <tr>
                         <td style="mso-padding-alt: 16px 24px; --bg-opacity: 1; background-color: #7367f0; background-color: rgba(115, 103, 240, var(--bg-opacity)); border-radius: 4px; font-family: Montserrat, -apple-system, 'Segoe UI', sans-serif;" bgcolor="rgba(115, 103, 240, var(--bg-opacity))">
-                          <a href="<?=$verify_link?>" style="display: block; font-weight: 600; font-size: 14px; line-height: 100%; padding: 16px 24px; --text-opacity: 1; color: #ffffff; color: rgba(255, 255, 255, var(--text-opacity)); text-decoration: none;">Verify Email Now &rarr;</a>
+                          <a href="https://telecom.connexxiongroup.com/our-services" style="display: block; font-weight: 600; font-size: 14px; line-height: 100%; padding: 16px 24px; --text-opacity: 1; color: #ffffff; color: rgba(255, 255, 255, var(--text-opacity)); text-decoration: none;">Browse Our Products &rarr;</a>
                         </td>
                       </tr>
                     </table>
@@ -249,7 +267,7 @@ BWPM/wPL+GibHaSkdgAAAABJRU5ErkJggg=="
                 </tr>
                 <tr>
                   <td style="font-family: Montserrat, -apple-system, 'Segoe UI', sans-serif; font-size: 12px; padding-left: 48px; padding-right: 48px; --text-opacity: 1; color: #eceff1; color: rgba(236, 239, 241, var(--text-opacity));">
-                    <p style="--text-opacity: 1; color: #263238; color: rgba(38, 50, 56, var(--text-opacity)); text-align: center;">
+                    <p style="--text-opacity: 1; color: #263238; color: rgba(38, 50, 56, var(--text-opacity)); text-align: center;" >
                       Connexxion Telecom, 2A Iller Crescent, Maitama, Abuja
                     </p>
                   </td>

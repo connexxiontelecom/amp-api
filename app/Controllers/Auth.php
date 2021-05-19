@@ -125,6 +125,11 @@ class Auth extends BaseController {
         }
         if ($save) {
           $payload['verified'] = true;
+          $email_data['data']['name'] = $affiliate['firstname'].' '.$affiliate['lastname'];
+          $email_data['subject'] = 'We are pleased to welcome you to AMP';
+          $email_data['email_template'] = 'welcome-email';
+          $email_data['email'] = $affiliate['email'];
+          $this->send_mail($email_data);
           return $this->respondUpdated($payload);
         } else {
           return $this->fail('Affiliate could not be verified');
