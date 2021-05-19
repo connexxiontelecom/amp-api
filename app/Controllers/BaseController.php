@@ -22,20 +22,18 @@ use App\Models\BankModel;
 use App\Models\CommissionModel;
 use App\Models\ProductModel;
 use App\Models\ProductPlanModel;
-
 use App\Models\ProductSaleModel;
-use CodeIgniter\Controller;
+
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
-
 use CodeIgniter\RESTful\ResourceController;
 use Psr\Log\LoggerInterface;
 
-use PHPMailer\PHPMailer\PHPMailer;
-use PHPMailer\PHPMailer\SMTP;
-use PHPMailer\PHPMailer\Exception;
-
-//require 'vendor/autoload.php';
+use SendinBlue\Client\Configuration;
+use SendinBlue\Client\Api\TransactionalEmailsApi;
+use SendinBlue\Client\Model\SendSmtpEmail;
+use SendinBlue\Client\ApiException;
+use GuzzleHttp\Client;
 
 use Firebase\JWT\JWT;
 
@@ -62,10 +60,10 @@ class BaseController extends ResourceController
 	protected $validation;
 	protected $decoded_token;
   protected $email;
-  protected $from_name;
-  protected $from_email;
+  protected $mail;
 
-	private $secret_key;
+  private $api_instance;
+  private $secret_key;
 
   /**
    * Constructor.
@@ -92,13 +90,28 @@ class BaseController extends ResourceController
 		$this->product_plan = new ProductPlanModel();
 		$this->admin_log = new AdminLogModel();
 		$this->product_sale = new ProductSaleModel();
+
 		$this->validation = \Config\Services::validation();
-		$this->email = new PHPMailer(true);
-		$this->from_name = getenv('FROM_NAME');
-		$this->from_email = getenv('FROM_EMAIL');
-		$this->secret_key = getenv('JWT_SECRET');
+
+		$config = Configuration::getDefaultConfiguration()->setApiKey('api-key', getenv('API_KEY'));
+    $this->api_instance = new TransactionalEmailsApi(new Client(), $config);
+    $this->mail = new SendSmtpEmail();
+
+    $this->secret_key = getenv('JWT_SECRET');
 		$this->decode_token();
 	}
+
+	protected function send_mail($email_data) {
+    $this->mail['subject'] = $email_data['subject'];
+    $this->mail['htmlContent'] = view('emails/'.$email_data['email_template'], $email_data['data']);
+    $this->mail['sender'] = array('name' => 'AMP | Powered by Connexxion Telecom', 'email' => 'support@connexxiontelecom.com');
+    $this->mail['to'] = array(array('email' => $email_data['email']));
+    try {
+      $this->api_instance->sendTransacEmail($this->mail);
+    } catch (ApiException $e) {
+      print_r('Exception when calling TransactionalEmailsApi->sendTransacEmail:'.$e->getMessage());
+    }
+  }
 
 	protected function jwt($user, $session, $permissions): string {
 		$payload = [
@@ -177,14 +190,5 @@ class BaseController extends ResourceController
 		return false;
 	}
 
-	protected function getEmailConfig(): array {
-	  $config['protocol'] = getenv('EMAIL_PROTOCOL');
-	  $config['SMTPHost'] = getenv('SMTP_HOST');
-	  $config['SMTPUser'] = getenv('SMTP_USER');
-	  $config['SMTPPass'] = getenv('SMTP_PASS');
-	  $config['SMTPPort'] = getenv('SMTP_PORT');
-	  $config['SMTPCrypto'] = getenv('SMTP_CRYPTO');
-	  $config['mailType'] = getenv('MAIL_TYPE');
-	  return $config;
-  }
+
 }

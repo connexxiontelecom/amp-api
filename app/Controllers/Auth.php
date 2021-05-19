@@ -82,24 +82,12 @@ class Auth extends BaseController {
 					  return $this->fail($ex->getMessage());
 				  }
 				  if ($save) {
-            try {
-              $this->email->isSMTP();
-              $this->email->Host = 'connexxiontelecom.com';
-              $this->email->SMTPAuth = true;
-              $this->email->Port = 465;
-              $this->email->Username = 'support@connexxiontelecom.com';
-              $this->email->Password = 'RM*Kv7J=p=[-FUOY}6';
-
-              $this->email->setFrom($this->from_email, $this->from_name);
-              $this->email->addAddress($this->request->getPost('email'));
-              $this->email->isHTML(true);
-              $this->email->Subject = 'Verify your email address on AMP';
-              $this->email->Body = '<p>Verification Mail is sent</p>';
-              $this->email->send();
-
-            } catch (Exception $e) {
-              print_r("Message could not be sent. Mailer Error: {$this->email->ErrorInfo}");
-            }
+				    $email_data['data']['name'] = $this->request->getPost('firstname').' '.$this->request->getPost('lastname');
+				    $email_data['data']['verify_link'] = 'https://app-amp.connexxiontelecom.com/verify-'.$this->request->getPost('verify_code');
+            $email_data['subject'] = 'Verify your email address on AMP';
+            $email_data['email_template'] = 'verify-email';
+            $email_data['email'] = $this->request->getPost('email');
+            $this->send_mail($email_data);
 					  return $this->respondCreated('Affiliate account was created. Login to your account');
 				  } else {
 					  return $this->fail('Affiliate account could not be created');
