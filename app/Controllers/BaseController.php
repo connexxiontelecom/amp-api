@@ -107,8 +107,9 @@ class BaseController extends ResourceController
     $this->mail['sender'] = array('name' => 'AMP | Powered by Connexxion Telecom', 'email' => 'support@connexxiontelecom.com');
     $this->mail['to'] = array(array('email' => $email_data['email']));
     try {
-      $this->api_instance->sendTransacEmail($this->mail);
-    } catch (ApiException $e) {
+      $result = $this->api_instance->sendTransacEmail($this->mail);
+//      print_r($result);
+    } catch (Exception $e) {
       print_r('Exception when calling TransactionalEmailsApi->sendTransacEmail:'.$e->getMessage());
     }
   }

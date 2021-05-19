@@ -83,7 +83,7 @@ class Auth extends BaseController {
 				  }
 				  if ($save) {
 				    $email_data['data']['name'] = $this->request->getPost('firstname').' '.$this->request->getPost('lastname');
-				    $email_data['data']['verify_link'] = 'https://app-amp.connexxiontelecom.com/verify-'.$this->request->getPost('verify_code');
+				    $email_data['data']['verify_link'] = getenv('FRONT_END').'verify-'.$this->request->getPost('verify_code');
             $email_data['subject'] = 'Verify your email address on AMP';
             $email_data['email_template'] = 'verify-email';
             $email_data['email'] = $this->request->getPost('email');
@@ -152,12 +152,12 @@ class Auth extends BaseController {
     ]);
     if ($this->validation->withRequest($this->request)->run()) {
       $email_data['data']['name'] = $this->request->getPost('firstname').' '.$this->request->getPost('lastname');
-      $email_data['data']['verify_link'] = 'https://app-amp.connexxiontelecom.com/verify-'.$this->request->getPost('verify_code');
+      $email_data['data']['verify_link'] = getenv('FRONT_END').'verify-'.$this->request->getPost('verify_code');
       $email_data['subject'] = 'Verify your email address on AMP';
       $email_data['email_template'] = 'verify-email';
       $email_data['email'] = $this->request->getPost('email');
       $this->send_mail($email_data);
-      return $this->respondCreated();
+      $this->respond('Verification email resent');
     } else {
       return $this->fail($this->validation->getErrors());
     }
