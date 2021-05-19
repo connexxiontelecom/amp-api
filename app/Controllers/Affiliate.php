@@ -314,6 +314,15 @@ class Affiliate extends BaseController {
 									$affiliate['upstream_affiliate'] = $upstream_affiliate['username'];
 									array_push($payload, $affiliate);
 								}
+                $email_data['data']['name'] = $affiliate_data['firstname'].' '.$affiliate_data['lastname'];
+                $email_data['data']['creator'] = 'administrator';
+                $email_data['data']['username'] = $affiliate_data['username'];
+                $email_data['data']['password'] = $this->request->getPost('password');
+                $email_data['data']['verify_link'] = getenv('FRONT_END').'verify-'.$this->request->getPost('verify_code');
+                $email_data['subject'] = 'Verify your email address on AMP';
+                $email_data['email'] = $affiliate_data['email'];
+                $email_data['email_template'] = 'verify-email-alt';
+                $this->send_mail($email_data);
 								return $this->respond($payload);
 							} else {
 								return $this->fail('Affiliate account could not be created');
@@ -362,6 +371,15 @@ class Affiliate extends BaseController {
 						try {
 							$save = $this->affiliate->save($affiliate_data);
 							if ($save) {
+                $email_data['data']['name'] = $affiliate_data['firstname'].' '.$affiliate_data['lastname'];
+                $email_data['data']['creator'] = 'affiliate';
+                $email_data['data']['username'] = $affiliate_data['username'];
+                $email_data['data']['password'] = $this->request->getPost('password');
+                $email_data['data']['verify_link'] = getenv('FRONT_END').'verify-'.$this->request->getPost('verify_code');
+                $email_data['subject'] = 'Verify your email address on AMP';
+                $email_data['email'] = $affiliate_data['email'];
+                $email_data['email_template'] = 'verify-email-alt';
+                $this->send_mail($email_data);
 								$affiliates = $this->affiliate->where('upstream_affiliate_id', $this->request->getPost('upstream_affiliate_id'))->findAll();
 								return $this->respond($affiliates);
 							} else {
