@@ -47,35 +47,35 @@ class Email extends BaseConfig
 	 *
 	 * @var string
 	 */
-	public $SMTPHost = 'smtp.mailtrap.io';
+	public $SMTPHost = 'connexxiontelecom.com';
 
 	/**
 	 * SMTP Username
 	 *
 	 * @var string
 	 */
-	public $SMTPUser = 'a67faaa8fd993a';
+	public $SMTPUser = 'support@connexxiontelecom.com';
 
 	/**
 	 * SMTP Password
 	 *
 	 * @var string
 	 */
-	public $SMTPPass = '0929b459b04aa4';
+	public $SMTPPass = 'RM*Kv7J=p=[-FUOY}6';
 
 	/**
 	 * SMTP Port
 	 *
 	 * @var integer
 	 */
-	public $SMTPPort = 2525;
+	public $SMTPPort = 465;
 
 	/**
 	 * SMTP Timeout (in seconds)
 	 *
 	 * @var integer
 	 */
-	public $SMTPTimeout = 5;
+	public $SMTPTimeout = 60;
 
 	/**
 	 * Enable persistent SMTP connections

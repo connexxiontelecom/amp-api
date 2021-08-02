@@ -82,11 +82,13 @@ class Auth extends BaseController {
 					  return $this->fail($ex->getMessage());
 				  }
 				  if ($save) {
-				    $email_data['data']['name'] = $this->request->getPost('firstname').' '.$this->request->getPost('lastname');
-				    $email_data['data']['verify_link'] = getenv('FRONT_END').'verify-'.$this->request->getPost('verify_code');
-            $email_data['subject'] = 'Verify your email address on AMP';
-            $email_data['email_template'] = 'verify-email';
-            $email_data['email'] = $this->request->getPost('email');
+				  	$data['name'] = $this->request->getPost('firstname').' '.$this->request->getPost('lastname');
+					  $data['verify_link'] =  getenv('FRONT_END').'verify-'.$this->request->getPost('verify_code');
+					  $email_data['message'] = view('emails/verify-email', $data);
+					  $email_data['subject'] = 'Verify your email address on AMP';
+					  $email_data['from_email'] = 'support@connexxiontelecom.com';
+					  $email_data['from_name'] = 'AMP | Powered by Connexxion Telecom';
+					  $email_data['to_email'] = $this->request->getPost('email');
             $this->send_mail($email_data);
 					  return $this->respondCreated('Affiliate account was created. Login to your account');
 				  } else {
@@ -124,12 +126,13 @@ class Auth extends BaseController {
           return $this->fail($ex->getMessage());
         }
         if ($save) {
-          $email_data['data']['name'] = $affiliate['firstname'].' '.$affiliate['lastname'];
-          $email_data['subject'] = 'We are pleased to welcome you to AMP';
-          $email_data['email_template'] = 'welcome-email';
-          $email_data['email'] = $affiliate['email'];
+	        $data['name'] = $affiliate['firstname'].' '.$affiliate['lastname'];
+	        $email_data['message'] = view('emails/welcome-email', $data);
+	        $email_data['subject'] = 'We are pleased to welcome you to AMP';
+	        $email_data['from_email'] = 'support@connexxiontelecom.com';
+	        $email_data['from_name'] = 'AMP | Powered by Connexxion Telecom';
+	        $email_data['to_email'] = $affiliate['email'];
           $this->send_mail($email_data);
-
           $payload['verified'] = true;
           return $this->respondUpdated($payload);
         } else {
@@ -151,15 +154,86 @@ class Auth extends BaseController {
       'verify_code' => 'required',
     ]);
     if ($this->validation->withRequest($this->request)->run()) {
-      $email_data['data']['name'] = $this->request->getPost('firstname').' '.$this->request->getPost('lastname');
-      $email_data['data']['verify_link'] = getenv('FRONT_END').'verify-'.$this->request->getPost('verify_code');
-      $email_data['subject'] = 'Verify your email address on AMP';
-      $email_data['email_template'] = 'verify-email';
-      $email_data['email'] = $this->request->getPost('email');
+    	$data['name'] = $this->request->getPost('firstname').' '.$this->request->getPost('lastname');
+    	$data['verify_link'] = getenv('FRONT_END').'verify-'.$this->request->getPost('verify_code');
+	    $email_data['message'] = view('emails/verify-email', $data);
+	    $email_data['subject'] = 'Verify your email address on AMP';
+	    $email_data['from_email'] = 'support@connexxiontelecom.com';
+	    $email_data['from_name'] = 'AMP | Powered by Connexxion Telecom';
+	    $email_data['to_email'] = $this->request->getPost('email');
       $this->send_mail($email_data);
-      $this->respond('Verification email resent');
+      return $this->respond('Verification email resent');
     } else {
       return $this->fail($this->validation->getErrors());
     }
   }
+
+	function send_reset_password_link() {
+		$this->validation->setRules([
+			'email' => 'required',
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$affiliate = $this->affiliate->where('email', $this->request->getPost('email'))->first();
+			if (!$affiliate) {
+				return $this->failNotFound('Affiliate with this email does not exist');
+			}
+			$verification_code = $this->get_verification_code($affiliate['affiliate_id'], 'reset_password');
+			$data['email'] = $this->request->getPost('email');
+			$data['name'] = $affiliate['firstname'].' '.$affiliate['lastname'];
+			$data['reset_password_link'] = getenv('FRONT_END').'reset-password-'.$verification_code;
+			$email_data['message'] = view('emails/reset-password-email', $data);
+			$email_data['subject'] = 'Reset your password on AMP';
+			$email_data['from_email'] = 'support@connexxiontelecom.com';
+			$email_data['from_name'] = 'AMP | Powered by Connexxion Telecom';
+			$email_data['to_email'] = $this->request->getPost('email');
+			$this->send_mail($email_data);
+			return $this->respond('Reset password link sent successfully. Please check your email.');
+		} else {
+			return $this->fail($this->validation->getErrors());
+		}
+	}
+
+	function reset_password() {
+		$this->validation->setRules([
+			'verification_code' => 'required',
+			'password' => 'required',
+		  'confirm_password' => 'required|matches[password]'
+		]);
+		if ($this->validation->withRequest($this->request)->run()) {
+			$verified = $this->verification->where([
+				'verification_code' => $this->request->getPost('verification_code'),
+				'verification_type' => 'reset_password',
+				'verification_status' => 0,
+			])->first();
+			if ($verified) {
+				$verification_data = [
+					'verification_id' => $verified['verification_id'],
+					'verification_status' => 1,
+				];
+				$this->verification->save($verification_data);
+				$affiliate = $this->affiliate->find($verified['affiliate_id']);
+				$affiliate_data = [
+					'affiliate_id' => $affiliate['affiliate_id'],
+					'password' => password_hash($this->request->getPost('password'), PASSWORD_BCRYPT)
+				];
+				if ($this->affiliate->save($affiliate_data)) {
+					$data['name'] = $affiliate['firstname'].' '.$affiliate['lastname'];
+					$data['login_link'] = getenv('FRONT_END').'login';
+					$email_data['message'] = view('emails/password-reset-email', $data);
+					$email_data['subject'] = 'Successfully reset your AMP password';
+					$email_data['from_email'] = 'support@connexxiontelecom.com';
+					$email_data['from_name'] = 'AMP | Powered by Connexxion Telecom';
+					$email_data['to_email'] = $affiliate['email'];
+					$this->send_mail($email_data);
+					return $this->respond('You have successfully reset your password. Please login with your new credentials.');
+				} else {
+					return $this->fail('An error occurred while resetting your password');
+				}
+			} else {
+				return $this->fail('Your verification link is not valid.');
+			}
+		} else {
+			return $this->fail($this->validation->getErrors());
+		}
+	}
 }

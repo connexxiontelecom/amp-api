@@ -314,14 +314,16 @@ class Affiliate extends BaseController {
 									$affiliate['upstream_affiliate'] = $upstream_affiliate['username'];
 									array_push($payload, $affiliate);
 								}
-                $email_data['data']['name'] = $affiliate_data['firstname'].' '.$affiliate_data['lastname'];
-                $email_data['data']['creator'] = 'administrator';
-                $email_data['data']['username'] = $affiliate_data['username'];
-                $email_data['data']['password'] = $this->request->getPost('password');
-                $email_data['data']['verify_link'] = getenv('FRONT_END').'verify-'.$this->request->getPost('verify_code');
-                $email_data['subject'] = 'Verify your email address on AMP';
-                $email_data['email'] = $affiliate_data['email'];
-                $email_data['email_template'] = 'verify-email-alt';
+								$data['name'] =  $affiliate_data['firstname'].' '.$affiliate_data['lastname'];
+								$data['creator'] = 'administrator';
+								$data['data'] = $affiliate_data['username'];
+								$data['password'] = $this->request->getPost('password');
+								$data['verify_link'] = getenv('FRONT_END').'verify-'.$this->request->getPost('verify_code');
+								$email_data['subject'] = 'Verify your email address on AMP';
+								$email_data['message'] = view('emails/verify-email-alt', $data);
+								$email_data['from_email'] = 'support@connexxiontelecom.com';
+								$email_data['from_name'] = 'AMP | Powered by Connexxion Telecom';
+								$email_data['to_email'] = $affiliate_data['email'];
                 $this->send_mail($email_data);
 								return $this->respond($payload);
 							} else {
@@ -371,14 +373,16 @@ class Affiliate extends BaseController {
 						try {
 							$save = $this->affiliate->save($affiliate_data);
 							if ($save) {
-                $email_data['data']['name'] = $affiliate_data['firstname'].' '.$affiliate_data['lastname'];
-                $email_data['data']['creator'] = 'affiliate';
-                $email_data['data']['username'] = $affiliate_data['username'];
-                $email_data['data']['password'] = $this->request->getPost('password');
-                $email_data['data']['verify_link'] = getenv('FRONT_END').'verify-'.$this->request->getPost('verify_code');
+								$data['name'] =  $affiliate_data['firstname'].' '.$affiliate_data['lastname'];
+                $data['creator'] = 'affiliate';
+								$data['data'] = $affiliate_data['username'];
+								$data['password'] = $this->request->getPost('password');
+								$data['verify_link'] = getenv('FRONT_END').'verify-'.$this->request->getPost('verify_code');
                 $email_data['subject'] = 'Verify your email address on AMP';
-                $email_data['email'] = $affiliate_data['email'];
-                $email_data['email_template'] = 'verify-email-alt';
+								$email_data['message'] = view('emails/verify-email-alt', $data);
+								$email_data['from_email'] = 'support@connexxiontelecom.com';
+								$email_data['from_name'] = 'AMP | Powered by Connexxion Telecom';
+								$email_data['to_email'] = $affiliate_data['email'];
                 $this->send_mail($email_data);
 								$affiliates = $this->affiliate->where('upstream_affiliate_id', $this->request->getPost('upstream_affiliate_id'))->findAll();
 								return $this->respond($affiliates);

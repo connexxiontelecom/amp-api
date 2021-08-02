@@ -23,17 +23,11 @@ use App\Models\CommissionModel;
 use App\Models\ProductModel;
 use App\Models\ProductPlanModel;
 use App\Models\ProductSaleModel;
-
+use App\Models\VerificationModel;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use CodeIgniter\RESTful\ResourceController;
 use Psr\Log\LoggerInterface;
-
-use SendinBlue\Client\Configuration;
-use SendinBlue\Client\Api\TransactionalEmailsApi;
-use SendinBlue\Client\Model\SendSmtpEmail;
-use SendinBlue\Client\ApiException;
-use GuzzleHttp\Client;
 
 use Firebase\JWT\JWT;
 
@@ -56,13 +50,12 @@ class BaseController extends ResourceController
 	protected $product;
 	protected $product_plan;
 	protected $product_sale;
+	protected $verification;
 	protected $admin_log;
 	protected $validation;
 	protected $decoded_token;
   protected $email;
-  protected $mail;
 
-  private $api_instance;
   private $secret_key;
 
   /**
@@ -90,29 +83,26 @@ class BaseController extends ResourceController
 		$this->product_plan = new ProductPlanModel();
 		$this->admin_log = new AdminLogModel();
 		$this->product_sale = new ProductSaleModel();
+		$this->verification = new VerificationModel();
 
 		$this->validation = \Config\Services::validation();
-
-		$config = Configuration::getDefaultConfiguration()->setApiKey('api-key', getenv('API_KEY'));
-    $this->api_instance = new TransactionalEmailsApi(new Client(), $config);
-    $this->mail = new SendSmtpEmail();
+		$this->email = \Config\Services::email();
 
     $this->secret_key = getenv('JWT_SECRET');
 		$this->decode_token();
 	}
 
 	protected function send_mail($email_data) {
-    $this->mail['subject'] = $email_data['subject'];
-    $this->mail['htmlContent'] = view('emails/'.$email_data['email_template'], $email_data['data']);
-    $this->mail['sender'] = array('name' => 'AMP | Powered by Connexxion Telecom', 'email' => 'support@connexxiontelecom.com');
-    $this->mail['to'] = array(array('email' => $email_data['email']));
-    try {
-      $result = $this->api_instance->sendTransacEmail($this->mail);
-//      print_r($result);
-    } catch (Exception $e) {
-      print_r('Exception when calling TransactionalEmailsApi->sendTransacEmail:'.$e->getMessage());
-    }
-  }
+		$this->email->setTo($email_data['to_email']);
+		$this->email->setFrom($email_data['from_email'], $email_data['from_name']);
+		$this->email->setSubject($email_data['subject']);
+		$this->email->setMessage($email_data['message']);
+		$sent = $this->email->send(FALSE);
+		if (!$sent) {
+			echo $this->email->printDebugger();
+		}
+		return $sent;
+	}
 
 	protected function jwt($user, $session, $permissions): string {
 		$payload = [
@@ -163,6 +153,26 @@ class BaseController extends ResourceController
 		}
 		return false;
 	}
+
+	protected function get_verification_code($affiliate_id, $verification_type) {
+		$verification_code = bin2hex(random_bytes(8));
+		$verification_data = [
+			'affiliate_id' => $affiliate_id,
+			'verification_type' => $verification_type,
+			'verification_code' => $verification_code,
+			'verification_status' => 0,
+		];
+		$verified = $this->verification->where([
+			'affiliate_id' => $affiliate_id,
+			'verification_type' => $verification_type
+		])->first();
+		if ($verified) {
+			$verification_data['verification_id'] = $verified['verification_id'];
+		}
+		$this->verification->save($verification_data);
+		return $verification_code;
+	}
+
 
 	private function get_authorization_header(): string {
 	  $authorization_header = '';
